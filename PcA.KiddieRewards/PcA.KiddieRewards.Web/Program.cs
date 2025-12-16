@@ -18,8 +18,15 @@ builder.Services.AddScoped<IPointsService, PointsService>();
 builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
 builder.Services.AddScoped<IPinHasher, PinHasher>();
 builder.Services.AddScoped<IPinAuthService, PinAuthService>();
+builder.Services.AddScoped<DataSeeder>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -36,6 +43,7 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -48,4 +56,4 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
-app.Run();
+await app.RunAsync();
