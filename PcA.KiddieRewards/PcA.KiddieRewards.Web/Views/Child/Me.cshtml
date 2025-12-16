@@ -1,0 +1,259 @@
+@{
+    ViewData["Title"] = "Mon espace";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary-subtle text-primary fw-bold me-3" style="width:64px;height:64px;display:grid;place-items:center;">N</div>
+            <div>
+                <p class="text-muted mb-1">Espace Enfant · Lecture seule</p>
+                <h1 class="h3 mb-0">Bonjour Noah</h1>
+                <small class="text-muted">Dernière mise à jour : 6 juin 2024</small>
+            </div>
+        </div>
+        <div class="ms-auto text-end">
+            <span class="badge bg-light text-body border">Famille Martin</span>
+            <div class="small text-muted">PIN requis pour changer de profil</div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total net</p>
+                    <h4 class="fw-semibold">+74</h4>
+                    <div class="small text-success">Bravo, continue comme ça !</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Points positifs</p>
+                    <h4 class="fw-semibold text-success">+92</h4>
+                    <div class="small text-muted">Lignes actives uniquement</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Points négatifs</p>
+                    <h4 class="fw-semibold text-danger">-18</h4>
+                    <div class="small text-muted">À surveiller</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Progression hebdo</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="flex-grow-1">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-primary" style="width: 68%;"></div>
+                            </div>
+                        </div>
+                        <span class="fw-semibold">68%</span>
+                    </div>
+                    <small class="text-muted d-block mt-2">Objectif familial : 5 bonnes actions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 d-flex align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Tes points récents</p>
+                        <h5 class="mb-0">Historique simplifié</h5>
+                    </div>
+                    <span class="badge bg-light text-body border ms-auto">Lecture seule</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-success-subtle text-success me-3">+5</span>
+                            <div class="flex-fill">
+                                <div class="fw-semibold">Devoirs terminés</div>
+                                <div class="text-muted small">Aujourd'hui · Validé par Papa</div>
+                            </div>
+                            <span class="badge bg-success">Actif</span>
+                        </div>
+                        <div class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-success-subtle text-success me-3">+3</span>
+                            <div class="flex-fill">
+                                <div class="fw-semibold">Aide aux tâches ménagères</div>
+                                <div class="text-muted small">Hier · Validé par Maman</div>
+                            </div>
+                            <span class="badge bg-success">Actif</span>
+                        </div>
+                        <div class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-danger-subtle text-danger me-3">-2</span>
+                            <div class="flex-fill">
+                                <div class="fw-semibold">Retard au coucher</div>
+                                <div class="text-muted small">Cette semaine · À revoir</div>
+                            </div>
+                            <span class="badge bg-warning text-dark">À revoir</span>
+                        </div>
+                        <div class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-secondary-subtle text-secondary me-3">RESET</span>
+                            <div class="flex-fill">
+                                <div class="fw-semibold">Remise à zéro familiale</div>
+                                <div class="text-muted small">Il y a 10 jours · Garde les traces</div>
+                            </div>
+                            <span class="badge bg-secondary">Archivé</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 text-muted small">
+                    Les parents peuvent modifier ou archiver ces lignes. Ici, tu peux seulement les consulter.
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 d-flex align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Vue détaillée</p>
+                        <h5 class="mb-0">Historique complet</h5>
+                    </div>
+                    <span class="badge bg-primary-subtle text-primary ms-auto">Net +74</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Motif</th>
+                                    <th>Points</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Participation aux tâches ménagères</td>
+                                    <td><span class="badge bg-success-subtle text-success">+3</span></td>
+                                    <td>05/06/2024</td>
+                                    <td><span class="badge bg-success">Actif</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Lecture du soir</td>
+                                    <td><span class="badge bg-success-subtle text-success">+1</span></td>
+                                    <td>04/06/2024</td>
+                                    <td><span class="badge bg-success">Actif</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Retard au coucher</td>
+                                    <td><span class="badge bg-danger-subtle text-danger">-2</span></td>
+                                    <td>03/06/2024</td>
+                                    <td><span class="badge bg-warning text-dark">À revoir</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Remise à zéro</td>
+                                    <td><span class="badge bg-secondary">0</span></td>
+                                    <td>26/05/2024</td>
+                                    <td><span class="badge bg-secondary">Archivé</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 d-flex align-items-center">
+                    <div class="text-muted small">Aucune action possible depuis cet écran.</div>
+                    <span class="badge bg-light text-body border ms-auto">Historique actif + archivé</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 d-flex align-items-center">
+                    <h5 class="mb-0">Objectifs du moment</h5>
+                    <span class="badge bg-info-subtle text-info ms-auto">Suivi</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="fw-semibold">Être prêt pour l'école</div>
+                            <span class="badge bg-success ms-auto">En bonne voie</span>
+                        </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar bg-success" style="width: 75%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">Sac préparé 3 soirs de suite</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="fw-semibold">Être gentil avec ta sœur</div>
+                            <span class="badge bg-warning text-dark ms-auto">À suivre</span>
+                        </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar bg-warning text-dark" style="width: 40%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">Un rappel positif ajouté hier</div>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center mb-1">
+                            <div class="fw-semibold">Heure de coucher</div>
+                            <span class="badge bg-danger-subtle text-danger ms-auto">À améliorer</span>
+                        </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar bg-danger" style="width: 25%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">Encore 3 soirs pour valider</div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 text-muted small">
+                    Les objectifs sont posés par les parents. Ils ne sont pas modifiables ici.
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 d-flex align-items-center">
+                    <h5 class="mb-0">Règles familiales</h5>
+                    <span class="badge bg-light text-body border ms-auto">Info</span>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex align-items-start">
+                            <span class="badge bg-primary-subtle text-primary me-3">+5</span>
+                            <div>
+                                <div class="fw-semibold">Aide spontanée</div>
+                                <div class="text-muted small">Ranger ta chambre sans rappel</div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 d-flex align-items-start">
+                            <span class="badge bg-primary-subtle text-primary me-3">+3</span>
+                            <div>
+                                <div class="fw-semibold">Politesse</div>
+                                <div class="text-muted small">Dire merci et s'il te plaît</div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 d-flex align-items-start">
+                            <span class="badge bg-danger-subtle text-danger me-3">-2</span>
+                            <div>
+                                <div class="fw-semibold">Retard au coucher</div>
+                                <div class="text-muted small">Chaque quart d'heure de retard</div>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0 d-flex align-items-start">
+                            <span class="badge bg-secondary-subtle text-secondary me-3">i</span>
+                            <div>
+                                <div class="fw-semibold">Reset</div>
+                                <div class="text-muted small">Utilisé seulement par les parents</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-0 text-muted small">
+                    Ces règles aident à comprendre comment les points sont calculés.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
