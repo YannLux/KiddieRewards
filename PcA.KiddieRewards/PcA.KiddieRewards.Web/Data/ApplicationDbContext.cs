@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace PcA.KiddieRewards.Web.Data
+namespace PcA.KiddieRewards.Web.Data;
+
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : AppDbContext(options)
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
-    {
-    }
 }
