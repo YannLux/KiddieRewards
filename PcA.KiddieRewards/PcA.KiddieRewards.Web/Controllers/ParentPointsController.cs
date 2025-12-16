@@ -1,0 +1,170 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PcA.KiddieRewards.Web.Data;
+using PcA.KiddieRewards.Web.Models;
+using PcA.KiddieRewards.Web.Services;
+
+namespace PcA.KiddieRewards.Web.Controllers;
+
+[Authorize(Roles = "Parent")]
+public class ParentPointsController(AppDbContext dbContext, IPointsService pointsService, ISuggestionsService suggestionsService) : Controller
+{
+    [HttpGet]
+    public async Task<IActionResult> AddPoints(CancellationToken cancellationToken)
+    {
+        if (!TryGetFamilyAndMember(out var familyId, out _))
+        {
+            return Forbid();
+        }
+
+        var viewModel = await BuildAddPointsViewModel(familyId, new AddPointsViewModel());
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddPoints(AddPointsViewModel model, CancellationToken cancellationToken)
+    {
+        if (!TryGetFamilyAndMember(out var familyId, out var createdByMemberId))
+        {
+            return Forbid();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var invalidModel = await BuildAddPointsViewModel(familyId, model);
+            return View(invalidModel);
+        }
+
+        await pointsService.AddPointsAsync(familyId, createdByMemberId, model.ChildMemberIds, model.Points, model.Reason, cancellationToken);
+        return RedirectToAction("Dashboard", "ParentDashboard");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditPoint(Guid id, CancellationToken cancellationToken)
+    {
+        if (!TryGetFamilyAndMember(out var familyId, out _))
+        {
+            return Forbid();
+        }
+
+        var entry = await dbContext.PointEntries
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id && p.FamilyId == familyId, cancellationToken);
+
+        if (entry is null)
+        {
+            return NotFound();
+        }
+
+        var viewModel = new EditPointViewModel
+        {
+            PointEntryId = entry.Id,
+            Points = entry.Points,
+            Reason = entry.Reason,
+            IsActive = entry.IsActive
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditPoint(EditPointViewModel model, CancellationToken cancellationToken)
+    {
+        if (!TryGetFamilyAndMember(out var familyId, out _))
+        {
+            return Forbid();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var entry = await dbContext.PointEntries
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == model.PointEntryId && p.FamilyId == familyId, cancellationToken);
+
+        if (entry is null)
+        {
+            return NotFound();
+        }
+
+        await pointsService.UpdatePointEntryAsync(entry.Id, model.Points, model.Reason, model.IsActive, cancellationToken);
+        return RedirectToAction("Dashboard", "ParentDashboard");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Suggestions(string? term, int limit = 10, CancellationToken cancellationToken = default)
+    {
+        if (!TryGetFamilyAndMember(out var familyId, out _))
+        {
+            return Forbid();
+        }
+
+        var suggestions = await suggestionsService.GetSuggestionsAsync(familyId, term, limit, cancellationToken);
+        return Json(suggestions);
+    }
+
+    private async Task<AddPointsViewModel> BuildAddPointsViewModel(Guid familyId, AddPointsViewModel model)
+    {
+        var children = await dbContext.Members
+            .AsNoTracking()
+            .Where(m => m.FamilyId == familyId && m.Role == MemberRole.Child && m.IsActive)
+            .OrderBy(m => m.DisplayName)
+            .ToListAsync();
+
+        return model with
+        {
+            AvailableChildren = children.Select(c => new MemberOption(c.Id, c.DisplayName)).ToList()
+        };
+    }
+
+    private bool TryGetFamilyAndMember(out Guid familyId, out Guid memberId)
+    {
+        var familyClaim = User.FindFirst("FamilyId")?.Value;
+        var memberClaim = User.FindFirst("MemberId")?.Value;
+
+        var hasFamily = Guid.TryParse(familyClaim, out familyId);
+        var hasMember = Guid.TryParse(memberClaim, out memberId);
+
+        return hasFamily && hasMember;
+    }
+}
+
+public record MemberOption(Guid Id, string DisplayName);
+
+public record AddPointsViewModel
+{
+    [Required]
+    public List<Guid> ChildMemberIds { get; init; } = new();
+
+    [Range(-1000, 1000)]
+    [Required]
+    public int Points { get; init; }
+
+    [Required]
+    [MaxLength(500)]
+    public string Reason { get; init; } = string.Empty;
+
+    public IReadOnlyList<MemberOption> AvailableChildren { get; init; } = new List<MemberOption>();
+}
+
+public record EditPointViewModel
+{
+    [Required]
+    public Guid PointEntryId { get; init; }
+
+    [Range(-1000, 1000)]
+    [Required]
+    public int Points { get; init; }
+
+    [Required]
+    [MaxLength(500)]
+    public string Reason { get; init; } = string.Empty;
+
+    public bool? IsActive { get; init; }
+}

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PcA.KiddieRewards.Web.Data;
+using PcA.KiddieRewards.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IPointsService, PointsService>();
+builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
+builder.Services.AddScoped<IPinHasher, PinHasher>();
+builder.Services.AddScoped<IPinAuthService, PinAuthService>();
 
 var app = builder.Build();
 
