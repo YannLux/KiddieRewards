@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Réglages Parent";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-1">Configuration</p>
+            <h1 class="h3 mb-0">Réglages</h1>
+        </div>
+        <div class="ms-auto">
+            <a class="btn btn-outline-secondary" href="/Parent/Dashboard">Retour au tableau de bord</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Préférences générales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
+                        <label class="form-check-label" for="enableNotifications">Notifications email pour les nouveaux points</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="childAccess" checked>
+                        <label class="form-check-label" for="childAccess">Autoriser les enfants à consulter leurs totaux</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="autoArchive">
+                        <label class="form-check-label" for="autoArchive">Archiver automatiquement après 30 jours</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Seuil d'alerte négatif</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" placeholder="Ex : -20">
+                            <span class="input-group-text">points</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Avatar par défaut</label>
+                        <select class="form-select">
+                            <option>Pingouin</option>
+                            <option>Chat</option>
+                            <option>Renard</option>
+                        </select>
+                        <div class="form-text">Les avatars sont prédéfinis côté site.</div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-outline-secondary">Annuler</button>
+                        <button class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Réinitialisation</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Utilisez une ligne d'historique spéciale pour remettre les compteurs à zéro.</p>
+                    <div class="alert alert-warning" role="alert">
+                        Cette action crée un événement "Reset" et ne supprime aucune donnée (IsActive = false sur l'ancien historique).
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="text" class="form-control" placeholder="Motif du reset">
+                        <button class="btn btn-danger">Déclencher</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Identité & accès</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Email principal</label>
+                        <input type="email" class="form-control" value="parent@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">PIN principal</label>
+                        <input type="text" class="form-control" value="•••• 1234">
+                        <div class="form-text">Chaque membre possède un PIN hashé unique.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mode d'accès</label>
+                        <select class="form-select">
+                            <option>Mot de passe + email</option>
+                            <option>Code PIN seulement</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary">Mettre à jour</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Planification</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Récurrence des bilans</label>
+                        <select class="form-select">
+                            <option>Hebdomadaire</option>
+                            <option>Mensuel</option>
+                            <option>Trimestriel</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jour préféré</label>
+                        <select class="form-select">
+                            <option>Lundi</option>
+                            <option>Mercredi</option>
+                            <option>Dimanche</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-secondary">Sauvegarder</button>
+                    </div>
+                    <div class="small text-muted mt-3">Suggestion : prévoir un rappel léger (email) sans JavaScript complexe.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
