@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "Ajouter des points";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-1">Actions rapides</p>
+            <h1 class="h3 mb-0">Ajouter ou corriger des points</h1>
+        </div>
+        <div class="ms-auto">
+            <a class="btn btn-outline-secondary" href="/Parent/Dashboard">Retour au tableau de bord</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Nouvelle ligne</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Enfant</label>
+                                <select class="form-select">
+                                    <option selected>Sélectionner</option>
+                                    <option>Léa</option>
+                                    <option>Noah</option>
+                                    <option>Zoé</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Type</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="type" id="typePlus" checked>
+                                    <label class="btn btn-outline-success" for="typePlus">+</label>
+                                    <input type="radio" class="btn-check" name="type" id="typeMinus">
+                                    <label class="btn btn-outline-danger" for="typeMinus">-</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Valeur</label>
+                                <input type="number" class="form-control" placeholder="5">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Motif</label>
+                                <input type="text" class="form-control" placeholder="Ex : Aide aux devoirs">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Détails complémentaires</label>
+                                <textarea class="form-control" rows="3" placeholder="Notes visibles par l'équipe parentale"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select">
+                                    <option value="Validated" selected>Validé</option>
+                                    <option value="Pending">À revoir</option>
+                                    <option value="Archived">Archivé</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="reset" class="btn btn-outline-secondary">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">Aperçu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar rounded-circle bg-primary-subtle text-primary fw-bold me-3" style="width:48px;height:48px;display:grid;place-items:center;">L</div>
+                        <div>
+                            <div class="fw-semibold">Léa</div>
+                            <div class="text-muted small">Aperçu en direct</div>
+                        </div>
+                        <span class="badge bg-success-subtle text-success ms-auto">+5 pts</span>
+                    </div>
+                    <p class="mb-1 fw-semibold">Motif</p>
+                    <p class="text-body-secondary">Devoirs terminés sans rappel.</p>
+                    <p class="mb-1 fw-semibold">Détails</p>
+                    <p class="text-body-secondary">Commentaires internes destinés aux parents.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 d-flex align-items-center">
+                    <h5 class="mb-0">Entrées récentes</h5>
+                    <a href="/Parent/Dashboard" class="ms-auto small text-decoration-none">Voir l'historique</a>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-success-subtle text-success me-3">+3</span>
+                            <div>
+                                <div class="fw-semibold">Zoé</div>
+                                <div class="text-muted small">Aide à la cuisine</div>
+                            </div>
+                            <span class="small text-muted ms-auto">Hier</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-danger-subtle text-danger me-3">-1</span>
+                            <div>
+                                <div class="fw-semibold">Noah</div>
+                                <div class="text-muted small">Conflit fratrie</div>
+                            </div>
+                            <span class="small text-muted ms-auto">Cette semaine</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="badge bg-success-subtle text-success me-3">+2</span>
+                            <div>
+                                <div class="fw-semibold">Léa</div>
+                                <div class="text-muted small">Lecture du soir</div>
+                            </div>
+                            <span class="small text-muted ms-auto">3 juin</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
