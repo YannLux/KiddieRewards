@@ -10,26 +10,82 @@ using PcA.KiddieRewards.Web.Services;
 
 namespace PcA.KiddieRewards.Web.Controllers
 {
-    public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager) : Controller
+    public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, IPointsService pointsService) : Controller
     {
-        [Authorize]
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            
-            if (!string.IsNullOrEmpty(userId))
+            // If user is not authenticated, show public landing page
+            if (!(User?.Identity?.IsAuthenticated ?? false))
             {
-                var userHasFamily = await dbContext.Members
-                    .AsNoTracking()
-                    .AnyAsync(m => m.Id == Guid.Parse(userId), cancellationToken);
+                return View();
+            }
 
-                if (!userHasFamily)
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return View();
+            }
+
+            // Check if user has any family membership
+            var userHasFamily = await dbContext.Members
+                .AsNoTracking()
+                .AnyAsync(m => m.Id == userGuid, cancellationToken);
+
+            if (!userHasFamily)
+            {
+                return RedirectToAction(nameof(OnboardingFamily));
+            }
+
+            // Determine selected family: cookie -> validate -> fallback to first family
+            Guid selectedFamilyId = Guid.Empty;
+            if (Request.Cookies.TryGetValue("SelectedFamilyId", out var cookieValue) && Guid.TryParse(cookieValue, out var cookieGuid))
+            {
+                // validate membership
+                var isMember = await dbContext.Members
+                    .AsNoTracking()
+                    .AnyAsync(m => m.Id == userGuid && m.FamilyId == cookieGuid, cancellationToken);
+
+                if (isMember)
                 {
-                    return RedirectToAction(nameof(OnboardingFamily));
+                    selectedFamilyId = cookieGuid;
                 }
             }
 
-            return View();
+            if (selectedFamilyId == Guid.Empty)
+            {
+                // fallback to the first family for this user
+                var member = await dbContext.Members
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.Id == userGuid, cancellationToken);
+
+                if (member is null)
+                {
+                    return RedirectToAction(nameof(OnboardingFamily));
+                }
+
+                selectedFamilyId = member.FamilyId;
+                // persist cookie
+                Response.Cookies.Append("SelectedFamilyId", selectedFamilyId.ToString(), new CookieOptions { HttpOnly = false });
+            }
+
+            // Build same view model as ParentDashboardController
+            var children = await dbContext.Members
+                .AsNoTracking()
+                .Where(m => m.FamilyId == selectedFamilyId && m.Role == MemberRole.Child && m.IsActive)
+                .OrderBy(m => m.DisplayName)
+                .ToListAsync(cancellationToken);
+
+            var childSummaries = new List<ChildDashboardItem>();
+            foreach (var child in children)
+            {
+                var totals = await pointsService.GetTotalsAsync(child.Id, cancellationToken);
+                childSummaries.Add(new ChildDashboardItem(child.Id, child.DisplayName, totals.Plus, totals.Minus, totals.Net));
+            }
+
+            var viewModel = new ParentDashboardViewModel(selectedFamilyId, childSummaries);
+
+            // Reuse existing Parent dashboard view if present
+            return View("~/Views/Parent/Dashboard.cshtml", viewModel);
         }
 
         public IActionResult Privacy()
@@ -116,6 +172,9 @@ namespace PcA.KiddieRewards.Web.Controllers
                 await signInManager.RefreshSignInAsync(identityUser);
             }
 
+            // Set selected family cookie
+            Response.Cookies.Append("SelectedFamilyId", family.Id.ToString(), new CookieOptions { HttpOnly = false });
+
             return RedirectToAction("Dashboard", "ParentDashboard");
         }
 
@@ -196,7 +255,38 @@ namespace PcA.KiddieRewards.Web.Controllers
                 await signInManager.RefreshSignInAsync(identityUser);
             }
 
+            // Set selected family cookie
+            Response.Cookies.Append("SelectedFamilyId", family.Id.ToString(), new CookieOptions { HttpOnly = false });
+
             return RedirectToAction("Dashboard", "ParentDashboard");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult SelectFamily(Guid id, string? returnUrl)
+        {
+            // Validate the family exists and belongs to the user
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return Forbid();
+            }
+
+            var member = dbContext.Members.AsNoTracking().FirstOrDefault(m => m.Id == userGuid && m.FamilyId == id);
+            if (member is null)
+            {
+                return Forbid();
+            }
+
+            // Set cookie to remember selected family
+            Response.Cookies.Append("SelectedFamilyId", id.ToString(), new CookieOptions { HttpOnly = false });
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

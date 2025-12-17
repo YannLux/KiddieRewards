@@ -1,0 +1,25 @@
+@model IEnumerable<PcA.KiddieRewards.Web.Models.Family>
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="familyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Famille
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="familyDropdown">
+        @if (!Model?.Any() ?? true)
+        {
+            <li class="dropdown-item-text text-muted">Aucune famille</li>
+        }
+        else
+        {
+            foreach (var f in Model)
+            {
+                <li>
+                    <a class="dropdown-item" asp-controller="Home" asp-action="SelectFamily" asp-route-id="@f.Id">@f.Name</a>
+                </li>
+            }
+        }
+        <li><hr class="dropdown-divider" /></li>
+        <li><a class="dropdown-item" asp-controller="Home" asp-action="CreateFamily">Créer une famille</a></li>
+        <li><a class="dropdown-item" asp-controller="Home" asp-action="JoinFamily">Rejoindre une famille</a></li>
+    </ul>
+</li>
