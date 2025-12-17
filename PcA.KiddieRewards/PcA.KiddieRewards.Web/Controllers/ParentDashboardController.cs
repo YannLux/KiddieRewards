@@ -38,8 +38,35 @@ public class ParentDashboardController(AppDbContext dbContext, IPointsService po
 
     private bool TryGetFamilyId(out Guid familyId)
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+        {
+            familyId = Guid.Empty;
+            return false;
+        }
+
+        // Try to get from claim first (for compatibility)
         var familyClaim = User.FindFirst("FamilyId")?.Value;
-        return Guid.TryParse(familyClaim, out familyId);
+        if (Guid.TryParse(familyClaim, out var claimFamilyId))
+        {
+            familyId = claimFamilyId;
+            return true;
+        }
+
+        // Otherwise, query the database to find the user's family
+        var member = dbContext.Members
+            .AsNoTracking()
+            .FirstOrDefault(m => m.Id == userGuid);
+
+        if (member is not null)
+        {
+            familyId = member.FamilyId;
+            return true;
+        }
+
+        familyId = Guid.Empty;
+        return false;
     }
 }
 

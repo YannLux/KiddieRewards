@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PcA.KiddieRewards.Web.Data;
+using PcA.KiddieRewards.Web.Middleware;
+using PcA.KiddieRewards.Web.Models;
 using PcA.KiddieRewards.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +13,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<AppDbContext>();
+// Add Identity with role support
+var identityBuilder = builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>();
+
+identityBuilder.AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddScoped<IPasswordHasher<Member>, PasswordHasher<Member>>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IPointsService, PointsService>();
 builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
@@ -41,10 +48,14 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Serve wwwroot static assets (css/js/lib)
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEnsureFamily();
 
 app.MapStaticAssets();
 

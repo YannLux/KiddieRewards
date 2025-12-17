@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Bienvenue - Créer ou rejoindre une famille";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="text-center mb-5">
+            <h1 class="h2 mb-2">Bienvenue sur Kiddie Rewards</h1>
+            <p class="text-muted">Commencez par créer ou rejoindre une famille</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="mb-3">
+                            <div class="display-1" style="font-size: 3rem;">?</div>
+                        </div>
+                        <h5 class="card-title mb-3">Créer une famille</h5>
+                        <p class="card-text text-muted flex-grow-1">
+                            Vous êtes le premier parent ? Créez votre groupe familial et commencez à gérer les points de vos enfants.
+                        </p>
+                        <a href="/Home/CreateFamily" class="btn btn-primary mt-auto">
+                            Créer une famille
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="mb-3">
+                            <div class="display-1" style="font-size: 3rem;">??</div>
+                        </div>
+                        <h5 class="card-title mb-3">Rejoindre une famille</h5>
+                        <p class="card-text text-muted flex-grow-1">
+                            Vous avez un code d'invitation ? Rejoignez la famille de vos proches en quelques clics.
+                        </p>
+                        <a href="/Home/JoinFamily" class="btn btn-outline-primary mt-auto">
+                            Rejoindre une famille
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <p class="text-muted small mb-0">
+                    <strong>Comment ça marche ?</strong> Une fois dans une famille, vous pourrez gérer les points, inviter d'autres parents et suivre la progression des enfants. Chaque famille dispose de ses propres règles et objectifs.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <form method="post" action="/Identity/Account/Logout">
+                <button type="submit" class="btn btn-link text-muted">
+                    Se déconnecter
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

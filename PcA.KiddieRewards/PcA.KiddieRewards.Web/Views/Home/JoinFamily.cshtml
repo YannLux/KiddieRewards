@@ -1,0 +1,74 @@
+@model JoinFamilyViewModel
+
+@{
+    ViewData["Title"] = "Rejoindre une famille";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="mb-4">
+            <a href="/Home/OnboardingFamily" class="btn btn-link text-muted">
+                ? Retour
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h1 class="h3 mb-4">Rejoindre une famille</h1>
+
+                <form asp-action="JoinFamily" method="post">
+                    <div class="mb-3">
+                        <label asp-for="FamilyInvitationCode" class="form-label">Code d'invitation</label>
+                        <input asp-for="FamilyInvitationCode" class="form-control" placeholder="Ex: FAM-12345-ABC" required>
+                        <small class="text-muted">Vous avez reçu ce code par email ou de la part d'un parent.</small>
+                        <span asp-validation-for="FamilyInvitationCode" class="text-danger small d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayName" class="form-label">Votre nom (prénom de parent)</label>
+                        <input asp-for="DisplayName" class="form-control" placeholder="Ex: Pierre" required>
+                        <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Pin" class="form-label">Code PIN (4-10 chiffres)</label>
+                        <input asp-for="Pin" type="password" inputmode="numeric" class="form-control" placeholder="Ex: 5678" required>
+                        <small class="text-muted">Définissez votre PIN personnel pour les connexions rapides.</small>
+                        <span asp-validation-for="Pin" class="text-danger small d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="AvatarKey" class="form-label">Avatar (optionnel)</label>
+                        <select asp-for="AvatarKey" class="form-select">
+                            <option value="parent-star">? Parent Star</option>
+                            <option value="lion">?? Lion</option>
+                            <option value="panda">?? Panda</option>
+                            <option value="penguin">?? Penguin</option>
+                            <option value="bear">?? Bear</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Rejoindre la famille
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <p class="text-muted small mb-0">
+                    <strong>Pas de code ?</strong> Demandez à un parent de votre famille de vous envoyer une invitation. Si vous êtes le premier parent, <a href="/Home/CreateFamily">créez une nouvelle famille</a> à la place.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

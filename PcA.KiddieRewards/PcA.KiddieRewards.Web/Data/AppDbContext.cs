@@ -5,8 +5,9 @@ using PcA.KiddieRewards.Web.Models;
 
 namespace PcA.KiddieRewards.Web.Data;
 
+// Change to include IdentityRole so AddRoles<IdentityRole>() can resolve IRoleStore<IdentityRole>
 public class AppDbContext(DbContextOptions options)
-    : IdentityDbContext<IdentityUser>(options)
+    : IdentityDbContext<IdentityUser, IdentityRole, string>(options)
 {
     public DbSet<Family> Families => Set<Family>();
 

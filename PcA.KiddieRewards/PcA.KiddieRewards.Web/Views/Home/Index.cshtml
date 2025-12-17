@@ -1,8 +1,104 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Kiddie Rewards - Gestion des points familiaux";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row align-items-center g-5">
+    <div class="col-lg-6">
+        <div>
+            <h1 class="display-5 fw-bold mb-3">Kiddie Rewards</h1>
+            <p class="lead text-muted mb-4">
+                Gérez les bons et mauvais points de votre famille de manière simple et ludique. Motivez vos enfants et suivez leur progression en temps réel.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="/Identity/Account/Register" class="btn btn-primary btn-lg">
+                    Créer un compte
+                </a>
+                <a href="/Identity/Account/Login" class="btn btn-outline-primary btn-lg">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-1" style="font-size: 2.5rem;">⭐</div>
+                        <h5 class="card-title mt-3">Récompenses</h5>
+                        <p class="card-text text-muted small">Motivez vos enfants avec un système de points</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-1" style="font-size: 2.5rem;">📊</div>
+                        <h5 class="card-title mt-3">Suivi</h5>
+                        <p class="card-text text-muted small">Consultez les statistiques en temps réel</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-1" style="font-size: 2.5rem;">👥</div>
+                        <h5 class="card-title mt-3">Famille</h5>
+                        <p class="card-text text-muted small">Travail en équipe parental</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-1" style="font-size: 2.5rem;">🔒</div>
+                        <h5 class="card-title mt-3">Sécurisé</h5>
+                        <p class="card-text text-muted small">Accès protégé par PIN</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="mt-5 pt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div>
+                <h5 class="fw-bold">✓ Pour les parents</h5>
+                <ul class="list-unstyled text-muted small mt-3">
+                    <li>✓ Gérer les enfants</li>
+                    <li>✓ Ajouter/modifier des points</li>
+                    <li>✓ Consulter l'historique</li>
+                    <li>✓ Faire des remises à zéro</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>
+                <h5 class="fw-bold">✓ Pour les enfants</h5>
+                <ul class="list-unstyled text-muted small mt-3">
+                    <li>✓ Consulter leurs points</li>
+                    <li>✓ Voir leur progression</li>
+                    <li>✓ Comparer avec la famille</li>
+                    <li>✓ Se motiver</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>
+                <h5 class="fw-bold">✓ Technologie</h5>
+                <ul class="list-unstyled text-muted small mt-3">
+                    <li>✓ Accès web moderne</li>
+                    <li>✓ Interface intuitive</li>
+                    <li>✓ Base de données sécurisée</li>
+                    <li>✓ Données persistantes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

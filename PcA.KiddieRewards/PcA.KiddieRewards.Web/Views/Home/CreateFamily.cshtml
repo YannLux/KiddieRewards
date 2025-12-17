@@ -1,0 +1,67 @@
+@model CreateFamilyViewModel
+
+@{
+    ViewData["Title"] = "Créer une famille";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="mb-4">
+            <a href="/Home/OnboardingFamily" class="btn btn-link text-muted">
+                ? Retour
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h1 class="h3 mb-4">Créer une nouvelle famille</h1>
+
+                <form asp-action="CreateFamily" method="post">
+                    <div class="mb-3">
+                        <label asp-for="FamilyName" class="form-label">Nom de la famille</label>
+                        <input asp-for="FamilyName" class="form-control" placeholder="Ex: Famille Martin" required>
+                        <span asp-validation-for="FamilyName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ParentDisplayName" class="form-label">Votre nom (prénom de parent)</label>
+                        <input asp-for="ParentDisplayName" class="form-control" placeholder="Ex: Sophie" required>
+                        <span asp-validation-for="ParentDisplayName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ParentPin" class="form-label">Code PIN (4-10 chiffres)</label>
+                        <input asp-for="ParentPin" type="password" inputmode="numeric" class="form-control" placeholder="Ex: 1234" required>
+                        <small class="text-muted">Vous utiliserez ce PIN pour vous connecter rapidement.</small>
+                        <span asp-validation-for="ParentPin" class="text-danger small d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="AvatarKey" class="form-label">Avatar (optionnel)</label>
+                        <select asp-for="AvatarKey" class="form-select">
+                            <option value="parent-star">? Parent Star</option>
+                            <option value="lion">?? Lion</option>
+                            <option value="panda">?? Panda</option>
+                            <option value="penguin">?? Penguin</option>
+                            <option value="bear">?? Bear</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Créer la famille
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <p class="text-muted small mb-0">
+                    <strong>Note :</strong> Vous serez défini comme Parent propriétaire. Vous pourrez ensuite inviter d'autres parents et ajouter vos enfants.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

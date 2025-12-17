@@ -17,6 +17,7 @@ public class DataSeeder(
 
     public async Task SeedAsync()
     {
+        await dbContext.Database.EnsureCreatedAsync();
         await dbContext.Database.MigrateAsync();
 
         await EnsureFamilyAsync();
