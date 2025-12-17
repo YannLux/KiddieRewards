@@ -33,7 +33,8 @@ public class ParentDashboardController(AppDbContext dbContext, IPointsService po
         }
 
         var viewModel = new ParentDashboardViewModel(familyId, childSummaries);
-        return View(viewModel);
+        // Explicitly point to the existing view under Views/Parent/Dashboard.cshtml
+        return View("~/Views/Parent/Dashboard.cshtml", viewModel);
     }
 
     private bool TryGetFamilyId(out Guid familyId)
