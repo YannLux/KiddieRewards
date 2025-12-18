@@ -1,0 +1,62 @@
+@model EditPointViewModel
+@{
+    ViewData["Title"] = "Modifier une ligne de points";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-1">Gestion des points</p>
+            <h1 class="h3 mb-0">Modifier une entrée</h1>
+        </div>
+        <div class="ms-auto">
+            <a class="btn btn-outline-secondary" asp-controller="ParentDashboard" asp-action="Dashboard">Retour au tableau de bord</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form asp-action="EditPoint" method="post">
+                <input type="hidden" asp-for="PointEntryId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="Points" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">±</span>
+                            <input asp-for="Points" class="form-control" type="number" />
+                        </div>
+                        <div class="form-text">Utilisez un nombre négatif pour retirer des points.</div>
+                        <span asp-validation-for="Points" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="IsActive" class="form-label">Statut</label>
+                        <select asp-for="IsActive" class="form-select">
+                            <option value="">Conserver le statut actuel</option>
+                            <option value="true">Activer</option>
+                            <option value="false">Désactiver</option>
+                        </select>
+                        <div class="form-text">Choisissez si la ligne reste active dans les totaux.</div>
+                        <span asp-validation-for="IsActive" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label asp-for="Reason" class="form-label"></label>
+                    <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Motif détaillé"></textarea>
+                    <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex align-items-center mt-4">
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                    <a class="btn btn-outline-secondary ms-2" asp-controller="ParentDashboard" asp-action="Dashboard">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
