@@ -125,13 +125,39 @@ public class ParentPointsController(AppDbContext dbContext, IPointsService point
 
     private bool TryGetFamilyAndMember(out Guid familyId, out Guid memberId)
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+        {
+            familyId = Guid.Empty;
+            memberId = Guid.Empty;
+            return false;
+        }
+
         var familyClaim = User.FindFirst("FamilyId")?.Value;
         var memberClaim = User.FindFirst("MemberId")?.Value;
 
-        var hasFamily = Guid.TryParse(familyClaim, out familyId);
-        var hasMember = Guid.TryParse(memberClaim, out memberId);
+        if (Guid.TryParse(familyClaim, out var claimFamilyId) && Guid.TryParse(memberClaim, out var claimMemberId))
+        {
+            familyId = claimFamilyId;
+            memberId = claimMemberId;
+            return true;
+        }
 
-        return hasFamily && hasMember;
+        var member = dbContext.Members
+            .AsNoTracking()
+            .FirstOrDefault(m => m.Id == userGuid);
+
+        if (member is not null)
+        {
+            familyId = member.FamilyId;
+            memberId = member.Id;
+            return true;
+        }
+
+        familyId = Guid.Empty;
+        memberId = Guid.Empty;
+        return false;
     }
 }
 
