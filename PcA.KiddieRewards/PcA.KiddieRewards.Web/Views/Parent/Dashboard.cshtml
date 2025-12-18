@@ -10,7 +10,7 @@
         </div>
         <div class="ms-auto d-flex gap-2">
             <a class="btn btn-outline-primary" href="#">Exporter</a>
-            <a class="btn btn-primary" href="/Parent/AddPoints">Ajouter des points</a>
+            <a class="btn btn-primary" asp-controller="ParentPoints" asp-action="AddPoints">Ajouter des points</a>
         </div>
     </div>
 
@@ -129,7 +129,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a class="btn btn-primary" href="/Parent/AddPoints">Ajouter des points</a>
+                        <a class="btn btn-primary" asp-controller="ParentPoints" asp-action="AddPoints">Ajouter des points</a>
                         <a class="btn btn-outline-primary" href="/Parent/ChildDetails">Consulter un enfant</a>
                         <a class="btn btn-outline-secondary" href="/Parent/Settings">Ouvrir les réglages</a>
                     </div>

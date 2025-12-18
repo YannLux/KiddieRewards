@@ -12,8 +12,8 @@
             </div>
         </div>
         <div class="ms-auto d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="/Parent/Dashboard">Retour</a>
-            <a class="btn btn-primary" href="/Parent/AddPoints">Ajouter des points</a>
+            <a class="btn btn-outline-secondary" asp-controller="ParentDashboard" asp-action="Dashboard">Retour</a>
+            <a class="btn btn-primary" asp-controller="ParentPoints" asp-action="AddPoints">Ajouter des points</a>
         </div>
     </div>
 
@@ -129,7 +129,7 @@
                                     <td>05/06/2024</td>
                                     <td><span class="badge bg-success">Validé</span></td>
                                     <td class="text-end">
-                                        <a class="btn btn-outline-primary btn-sm" href="/Parent/AddPoints">Corriger</a>
+                                        <a class="btn btn-outline-primary btn-sm" asp-controller="ParentPoints" asp-action="AddPoints">Corriger</a>
                                     </td>
                                 </tr>
                                 <tr>

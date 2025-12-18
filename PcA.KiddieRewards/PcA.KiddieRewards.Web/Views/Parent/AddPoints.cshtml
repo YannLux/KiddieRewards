@@ -9,7 +9,7 @@
             <h1 class="h3 mb-0">Ajouter ou corriger des points</h1>
         </div>
         <div class="ms-auto">
-            <a class="btn btn-outline-secondary" href="/Parent/Dashboard">Retour au tableau de bord</a>
+            <a class="btn btn-outline-secondary" asp-controller="ParentDashboard" asp-action="Dashboard">Retour au tableau de bord</a>
         </div>
     </div>
 
@@ -98,7 +98,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 d-flex align-items-center">
                     <h5 class="mb-0">Entrées récentes</h5>
-                    <a href="/Parent/Dashboard" class="ms-auto small text-decoration-none">Voir l'historique</a>
+                    <a asp-controller="ParentDashboard" asp-action="Dashboard" class="ms-auto small text-decoration-none">Voir l'historique</a>
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
