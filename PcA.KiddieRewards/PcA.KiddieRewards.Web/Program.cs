@@ -25,6 +25,7 @@ builder.Services.AddScoped<IPointsService, PointsService>();
 builder.Services.AddScoped<ISuggestionsService, SuggestionsService>();
 builder.Services.AddScoped<IPinHasher, PinHasher>();
 builder.Services.AddScoped<IPinAuthService, PinAuthService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<DataSeeder>();
 
 var app = builder.Build();

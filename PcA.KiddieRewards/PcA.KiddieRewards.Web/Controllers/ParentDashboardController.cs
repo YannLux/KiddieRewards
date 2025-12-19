@@ -8,7 +8,7 @@ using PcA.KiddieRewards.Web.Services;
 namespace PcA.KiddieRewards.Web.Controllers;
 
 [Authorize(Roles = "Parent")]
-public class ParentDashboardController(AppDbContext dbContext, IPointsService pointsService) : Controller
+public class ParentDashboardController(AppDbContext dbContext, IDashboardService dashboardService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Dashboard(CancellationToken cancellationToken)
@@ -18,21 +18,8 @@ public class ParentDashboardController(AppDbContext dbContext, IPointsService po
             return Forbid();
         }
 
-        var children = await dbContext.Members
-            .AsNoTracking()
-            .Where(m => m.FamilyId == familyId && m.Role == MemberRole.Child && m.IsActive)
-            .OrderBy(m => m.DisplayName)
-            .ToListAsync(cancellationToken);
+        var viewModel = await dashboardService.BuildParentDashboardAsync(familyId, cancellationToken);
 
-        var childSummaries = new List<ChildDashboardItem>();
-
-        foreach (var child in children)
-        {
-            var totals = await pointsService.GetTotalsAsync(child.Id, cancellationToken);
-            childSummaries.Add(new ChildDashboardItem(child.Id, child.DisplayName, totals.Plus, totals.Minus, totals.Net));
-        }
-
-        var viewModel = new ParentDashboardViewModel(familyId, childSummaries);
         // Explicitly point to the existing view under Views/Parent/Dashboard.cshtml
         return View("~/Views/Parent/Dashboard.cshtml", viewModel);
     }
@@ -70,7 +57,3 @@ public class ParentDashboardController(AppDbContext dbContext, IPointsService po
         return false;
     }
 }
-
-public record ChildDashboardItem(Guid MemberId, string DisplayName, int Plus, int Minus, int Net);
-
-public record ParentDashboardViewModel(Guid FamilyId, IReadOnlyList<ChildDashboardItem> Children);

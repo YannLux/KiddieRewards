@@ -1,5 +1,41 @@
+@model ParentDashboardViewModel
 @{
     ViewData["Title"] = "Tableau de bord Parent";
+
+    string FormatPoints(int value) => value switch
+    {
+        > 0 => $"+{value}",
+        < 0 => value.ToString(),
+        _ => "0"
+    };
+
+    string FormatWeeklyChange(int value) => value switch
+    {
+        > 0 => $"+{value} cette semaine",
+        < 0 => $"{value} cette semaine",
+        _ => "Aucun changement cette semaine"
+    };
+
+    string StatusLabel(RecentPointEntryItem entry) => entry switch
+    {
+        { IsReset: true } => "Reset",
+        { IsActive: true } => "Actif",
+        _ => "Archivé"
+    };
+
+    string StatusBadgeClass(RecentPointEntryItem entry) => entry switch
+    {
+        { IsReset: true } => "badge bg-secondary",
+        { IsActive: true } => "badge bg-success",
+        _ => "badge bg-secondary"
+    };
+
+    string PointsBadgeClass(int points) => points switch
+    {
+        > 0 => "badge bg-success-subtle text-success",
+        < 0 => "badge bg-danger-subtle text-danger",
+        _ => "badge bg-secondary-subtle text-secondary"
+    };
 }
 
 <div class="container py-4">
@@ -19,8 +55,8 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body">
                     <p class="text-muted mb-1">Total net</p>
-                    <h4 class="fw-semibold">+128</h4>
-                    <small class="text-success">+12 cette semaine</small>
+                    <h4 class="fw-semibold">@FormatPoints(Model.Stats.Net)</h4>
+                    <small class="text-success">@FormatWeeklyChange(Model.Stats.WeeklyNet)</small>
                 </div>
             </div>
         </div>
@@ -28,7 +64,7 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body">
                     <p class="text-muted mb-1">Points positifs</p>
-                    <h4 class="fw-semibold text-success">+184</h4>
+                    <h4 class="fw-semibold text-success">@FormatPoints(Model.Stats.Plus)</h4>
                     <small class="text-muted">Récompenses méritées</small>
                 </div>
             </div>
@@ -37,7 +73,7 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body">
                     <p class="text-muted mb-1">Points négatifs</p>
-                    <h4 class="fw-semibold text-danger">-56</h4>
+                    <h4 class="fw-semibold text-danger">@(Model.Stats.Minus == 0 ? "0" : $"-{Model.Stats.Minus}")</h4>
                     <small class="text-muted">À suivre de près</small>
                 </div>
             </div>
@@ -46,11 +82,19 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body">
                     <p class="text-muted mb-1">Enfants suivis</p>
-                    <h4 class="fw-semibold">3</h4>
-                    <div class="d-flex gap-1 mt-2">
-                        <span class="badge bg-light text-body border">Léa</span>
-                        <span class="badge bg-light text-body border">Noah</span>
-                        <span class="badge bg-light text-body border">Zoé</span>
+                    <h4 class="fw-semibold">@Model.Children.Count</h4>
+                    <div class="d-flex gap-1 mt-2 flex-wrap">
+                        @if (!Model.Children.Any())
+                        {
+                            <span class="text-muted small">Aucun enfant actif</span>
+                        }
+                        else
+                        {
+                            foreach (var child in Model.Children)
+                            {
+                                <span class="badge bg-light text-body border">@child.DisplayName</span>
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -70,49 +114,38 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Enfant</th>
-                                    <th>Motif</th>
-                                    <th>Points</th>
-                                    <th>Date</th>
-                                    <th class="text-end">Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="fw-semibold">Léa</td>
-                                    <td>Devoirs terminés</td>
-                                    <td><span class="badge bg-success-subtle text-success">+5</span></td>
-                                    <td>05/06/2024</td>
-                                    <td class="text-end"><span class="badge bg-success">Validé</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-semibold">Noah</td>
-                                    <td>Retard au coucher</td>
-                                    <td><span class="badge bg-danger-subtle text-danger">-2</span></td>
-                                    <td>04/06/2024</td>
-                                    <td class="text-end"><span class="badge bg-warning text-dark">À revoir</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-semibold">Zoé</td>
-                                    <td>Aide aux tâches ménagères</td>
-                                    <td><span class="badge bg-success-subtle text-success">+3</span></td>
-                                    <td>03/06/2024</td>
-                                    <td class="text-end"><span class="badge bg-success">Validé</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-semibold">Léa</td>
-                                    <td>Conflit fratrie</td>
-                                    <td><span class="badge bg-danger-subtle text-danger">-1</span></td>
-                                    <td>02/06/2024</td>
-                                    <td class="text-end"><span class="badge bg-secondary">Archivé</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    @if (!Model.RecentEntries.Any())
+                    {
+                        <div class="p-4 text-center text-muted">Aucune activité récente à afficher.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Enfant</th>
+                                        <th>Motif</th>
+                                        <th>Points</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var entry in Model.RecentEntries)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold">@entry.ChildDisplayName</td>
+                                            <td>@entry.Reason</td>
+                                            <td><span class="@PointsBadgeClass(entry.Points)">@FormatPoints(entry.Points)</span></td>
+                                            <td>@entry.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                            <td class="text-end"><span class="@StatusBadgeClass(entry)">@StatusLabel(entry)</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
                 <div class="card-footer bg-white border-0 text-end">
                     <button class="btn btn-outline-primary btn-sm">Exporter l'historique</button>
