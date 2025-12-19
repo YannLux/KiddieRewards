@@ -1,0 +1,21 @@
+namespace PcA.KiddieRewards.Web.Models;
+
+public record ChildDashboardItem(Guid MemberId, string DisplayName, int Plus, int Minus, int Net);
+
+public record ParentDashboardStats(int Plus, int Minus, int Net, int WeeklyNet);
+
+public record RecentPointEntryItem(
+    Guid PointEntryId,
+    Guid ChildMemberId,
+    string ChildDisplayName,
+    int Points,
+    string Reason,
+    DateTime CreatedAt,
+    bool IsActive,
+    bool IsReset);
+
+public record ParentDashboardViewModel(
+    Guid FamilyId,
+    IReadOnlyList<ChildDashboardItem> Children,
+    ParentDashboardStats Stats,
+    IReadOnlyList<RecentPointEntryItem> RecentEntries);

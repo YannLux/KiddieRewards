@@ -10,8 +10,8 @@ using PcA.KiddieRewards.Web.Services;
 
 namespace PcA.KiddieRewards.Web.Controllers
 {
-    public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, IPointsService pointsService) : Controller
-    {
+public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, IDashboardService dashboardService) : Controller
+{
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             // If user is not authenticated, show public landing page
@@ -68,21 +68,7 @@ namespace PcA.KiddieRewards.Web.Controllers
                 Response.Cookies.Append("SelectedFamilyId", selectedFamilyId.ToString(), new CookieOptions { HttpOnly = false });
             }
 
-            // Build same view model as ParentDashboardController
-            var children = await dbContext.Members
-                .AsNoTracking()
-                .Where(m => m.FamilyId == selectedFamilyId && m.Role == MemberRole.Child && m.IsActive)
-                .OrderBy(m => m.DisplayName)
-                .ToListAsync(cancellationToken);
-
-            var childSummaries = new List<ChildDashboardItem>();
-            foreach (var child in children)
-            {
-                var totals = await pointsService.GetTotalsAsync(child.Id, cancellationToken);
-                childSummaries.Add(new ChildDashboardItem(child.Id, child.DisplayName, totals.Plus, totals.Minus, totals.Net));
-            }
-
-            var viewModel = new ParentDashboardViewModel(selectedFamilyId, childSummaries);
+            var viewModel = await dashboardService.BuildParentDashboardAsync(selectedFamilyId, cancellationToken);
 
             // Reuse existing Parent dashboard view if present
             return View("~/Views/Parent/Dashboard.cshtml", viewModel);
@@ -122,14 +108,14 @@ namespace PcA.KiddieRewards.Web.Controllers
                 return Forbid();
             }
 
-            // Vérifier que l'utilisateur n'a pas déjà une famille
+            // VÃ©rifier que l'utilisateur n'a pas dÃ©jÃ  une famille
             var existingMember = await dbContext.Members
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == userGuid, cancellationToken);
             
             if (existingMember != null)
             {
-                ModelState.AddModelError("", "Vous avez déjà une famille assignée.");
+                ModelState.AddModelError("", "Vous avez dÃ©jÃ  une famille assignÃ©e.");
                 return View(model);
             }
 
@@ -201,19 +187,19 @@ namespace PcA.KiddieRewards.Web.Controllers
                 return Forbid();
             }
 
-            // Vérifier que l'utilisateur n'a pas déjà une famille
+            // VÃ©rifier que l'utilisateur n'a pas dÃ©jÃ  une famille
             var existingMember = await dbContext.Members
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == userGuid, cancellationToken);
             
             if (existingMember != null)
             {
-                ModelState.AddModelError("", "Vous avez déjà une famille assignée.");
+                ModelState.AddModelError("", "Vous avez dÃ©jÃ  une famille assignÃ©e.");
                 return View(model);
             }
 
-            // Pour MVP: utiliser le code d'invitation comme clé pour retrouver la famille
-            // En production, cela devrait être un système plus sécurisé
+            // Pour MVP: utiliser le code d'invitation comme clÃ© pour retrouver la famille
+            // En production, cela devrait Ãªtre un systÃ¨me plus sÃ©curisÃ©
             var family = await dbContext.Families
                 .FirstOrDefaultAsync(f => f.Name == model.FamilyInvitationCode, cancellationToken);
 
@@ -299,15 +285,15 @@ namespace PcA.KiddieRewards.Web.Controllers
     public record CreateFamilyViewModel
     {
         [Required(ErrorMessage = "Le nom de la famille est requis.")]
-        [MaxLength(200, ErrorMessage = "Le nom ne peut pas dépasser 200 caractères.")]
+        [MaxLength(200, ErrorMessage = "Le nom ne peut pas dÃ©passer 200 caractÃ¨res.")]
         public string FamilyName { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Votre nom est requis.")]
-        [MaxLength(100, ErrorMessage = "Votre nom ne peut pas dépasser 100 caractères.")]
+        [MaxLength(100, ErrorMessage = "Votre nom ne peut pas dÃ©passer 100 caractÃ¨res.")]
         public string ParentDisplayName { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Le code PIN est requis.")]
-        [StringLength(10, MinimumLength = 4, ErrorMessage = "Le PIN doit être entre 4 et 10 caractères.")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage = "Le PIN doit Ãªtre entre 4 et 10 caractÃ¨res.")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Le PIN ne doit contenir que des chiffres.")]
         public string ParentPin { get; init; } = string.Empty;
 
@@ -321,11 +307,11 @@ namespace PcA.KiddieRewards.Web.Controllers
         public string FamilyInvitationCode { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Votre nom est requis.")]
-        [MaxLength(100, ErrorMessage = "Votre nom ne peut pas dépasser 100 caractères.")]
+        [MaxLength(100, ErrorMessage = "Votre nom ne peut pas dÃ©passer 100 caractÃ¨res.")]
         public string DisplayName { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Le code PIN est requis.")]
-        [StringLength(10, MinimumLength = 4, ErrorMessage = "Le PIN doit être entre 4 et 10 caractères.")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage = "Le PIN doit Ãªtre entre 4 et 10 caractÃ¨res.")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Le PIN ne doit contenir que des chiffres.")]
         public string Pin { get; init; } = string.Empty;
 
