@@ -59,6 +59,10 @@ public class AppDbContext(DbContextOptions options)
         {
             entity.HasKey(p => p.Id);
             entity.Property(p => p.Points).IsRequired();
+            entity.Property(p => p.Type)
+                  .IsRequired()
+                  .HasDefaultValue(PointEntryType.GoodPoint)
+                  .HasConversion<int>();
             entity.Property(p => p.Reason)
                   .IsRequired()
                   .HasMaxLength(500);
@@ -71,6 +75,7 @@ public class AppDbContext(DbContextOptions options)
 
             entity.HasIndex(p => p.FamilyId);
             entity.HasIndex(p => p.ChildMemberId);
+            entity.HasIndex(p => p.Type);
             entity.HasIndex(p => p.IsActive);
 
             entity.HasOne(p => p.Family)

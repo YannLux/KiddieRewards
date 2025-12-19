@@ -16,25 +16,48 @@
         _ => "Aucun changement cette semaine"
     };
 
+    PointEntryType EffectiveType(RecentPointEntryItem entry) => entry.IsReset ? PointEntryType.Reset : entry.Type;
+
     string StatusLabel(RecentPointEntryItem entry) => entry switch
     {
-        { IsReset: true } => "Reset",
+        _ when EffectiveType(entry) == PointEntryType.Reset => "Reset",
         { IsActive: true } => "Actif",
         _ => "Archivé"
     };
 
     string StatusBadgeClass(RecentPointEntryItem entry) => entry switch
     {
-        { IsReset: true } => "badge bg-secondary",
+        _ when EffectiveType(entry) == PointEntryType.Reset => "badge bg-secondary",
         { IsActive: true } => "badge bg-success",
         _ => "badge bg-secondary"
     };
 
-    string PointsBadgeClass(int points) => points switch
+    string TypeLabel(RecentPointEntryItem entry) => EffectiveType(entry) switch
     {
-        > 0 => "badge bg-success-subtle text-success",
-        < 0 => "badge bg-danger-subtle text-danger",
-        _ => "badge bg-secondary-subtle text-secondary"
+        PointEntryType.GoodPoint => "Bon point",
+        PointEntryType.BadPoint => "Mauvais point",
+        PointEntryType.Reward => "Récompense",
+        PointEntryType.Bonus => "Bonus",
+        PointEntryType.Reset => "Reset",
+        _ => "Autre"
+    };
+
+    string TypeBadgeClass(RecentPointEntryItem entry) => EffectiveType(entry) switch
+    {
+        PointEntryType.GoodPoint => "badge bg-success-subtle text-success",
+        PointEntryType.BadPoint => "badge bg-danger-subtle text-danger",
+        PointEntryType.Reward => "badge bg-warning-subtle text-warning",
+        PointEntryType.Bonus => "badge bg-info-subtle text-info",
+        PointEntryType.Reset => "badge bg-secondary-subtle text-secondary",
+        _ => "badge bg-light text-body border"
+    };
+
+    string PointsBadgeClass(RecentPointEntryItem entry) => EffectiveType(entry) switch
+    {
+        PointEntryType.BadPoint or PointEntryType.Reward => "badge bg-danger-subtle text-danger",
+        PointEntryType.Bonus => "badge bg-info-subtle text-info",
+        PointEntryType.Reset => "badge bg-secondary-subtle text-secondary",
+        _ => entry.Points > 0 ? "badge bg-success-subtle text-success" : "badge bg-secondary-subtle text-secondary"
     };
 }
 
@@ -126,6 +149,7 @@
                                     <tr>
                                         <th>Enfant</th>
                                         <th>Motif</th>
+                                        <th>Type</th>
                                         <th>Points</th>
                                         <th>Date</th>
                                         <th class="text-end">Statut</th>
@@ -137,7 +161,8 @@
                                         <tr>
                                             <td class="fw-semibold">@entry.ChildDisplayName</td>
                                             <td>@entry.Reason</td>
-                                            <td><span class="@PointsBadgeClass(entry.Points)">@FormatPoints(entry.Points)</span></td>
+                                            <td><span class="@TypeBadgeClass(entry)">@TypeLabel(entry)</span></td>
+                                            <td><span class="@PointsBadgeClass(entry)">@FormatPoints(entry.Points)</span></td>
                                             <td>@entry.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
                                             <td class="text-end"><span class="@StatusBadgeClass(entry)">@StatusLabel(entry)</span></td>
                                         </tr>

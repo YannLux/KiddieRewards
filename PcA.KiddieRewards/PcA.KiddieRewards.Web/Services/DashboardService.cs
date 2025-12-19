@@ -57,7 +57,8 @@ public class DashboardService(AppDbContext dbContext, IPointsService pointsServi
                 p.Reason,
                 p.CreatedAt,
                 p.IsActive,
-                p.IsReset))
+                p.Type == PointEntryType.Reset || p.IsReset,
+                p.Type))
             .ToListAsync(cancellationToken);
 
         var stats = new ParentDashboardStats(totalPlus, totalMinus, totalPlus - totalMinus, weeklyNet);

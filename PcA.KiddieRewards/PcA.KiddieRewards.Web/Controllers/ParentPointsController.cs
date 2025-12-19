@@ -38,7 +38,7 @@ public class ParentPointsController(AppDbContext dbContext, IPointsService point
             return View(invalidModel);
         }
 
-        await pointsService.AddPointsAsync(familyId, createdByMemberId, model.ChildMemberIds, model.Points, model.Reason, cancellationToken);
+        await pointsService.AddPointsAsync(familyId, createdByMemberId, model.ChildMemberIds, model.Type, model.Points, model.Reason, cancellationToken);
         return RedirectToAction("Dashboard", "ParentDashboard");
     }
 
@@ -64,6 +64,7 @@ public class ParentPointsController(AppDbContext dbContext, IPointsService point
             PointEntryId = entry.Id,
             Points = entry.Points,
             Reason = entry.Reason,
+            Type = entry.Type,
             IsActive = entry.IsActive
         };
 
@@ -93,7 +94,7 @@ public class ParentPointsController(AppDbContext dbContext, IPointsService point
             return NotFound();
         }
 
-        await pointsService.UpdatePointEntryAsync(entry.Id, model.Points, model.Reason, model.IsActive, cancellationToken);
+        await pointsService.UpdatePointEntryAsync(entry.Id, model.Type, model.Points, model.Reason, model.IsActive, cancellationToken);
         return RedirectToAction("Dashboard", "ParentDashboard");
     }
 
@@ -163,12 +164,12 @@ public class ParentPointsController(AppDbContext dbContext, IPointsService point
 
 public record MemberOption(Guid Id, string DisplayName);
 
-public record AddPointsViewModel
+public record AddPointsViewModel : IValidatableObject
 {
     [Required]
     public List<Guid> ChildMemberIds { get; init; } = new();
 
-    [Range(-1000, 1000)]
+    [Range(-10000, 10000)]
     [Required]
     public int Points { get; init; }
 
@@ -176,15 +177,36 @@ public record AddPointsViewModel
     [MaxLength(500)]
     public string Reason { get; init; } = string.Empty;
 
+    [Required]
+    public PointEntryType Type { get; init; } = PointEntryType.GoodPoint;
+
     public IReadOnlyList<MemberOption> AvailableChildren { get; init; } = new List<MemberOption>();
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Type == PointEntryType.Reset)
+        {
+            yield break;
+        }
+
+        if ((Type == PointEntryType.GoodPoint || Type == PointEntryType.Bonus) && Points <= 0)
+        {
+            yield return new ValidationResult("Les bons points et bonus doivent être strictement positifs.", new[] { nameof(Points) });
+        }
+
+        if ((Type == PointEntryType.BadPoint || Type == PointEntryType.Reward) && Points >= 0)
+        {
+            yield return new ValidationResult("Les mauvais points et récompenses doivent être négatifs.", new[] { nameof(Points) });
+        }
+    }
 }
 
-public record EditPointViewModel
+public record EditPointViewModel : IValidatableObject
 {
     [Required]
     public Guid PointEntryId { get; init; }
 
-    [Range(-1000, 1000)]
+    [Range(-10000, 10000)]
     [Required]
     public int Points { get; init; }
 
@@ -192,5 +214,26 @@ public record EditPointViewModel
     [MaxLength(500)]
     public string Reason { get; init; } = string.Empty;
 
+    [Required]
+    public PointEntryType Type { get; init; } = PointEntryType.GoodPoint;
+
     public bool? IsActive { get; init; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Type == PointEntryType.Reset)
+        {
+            yield break;
+        }
+
+        if ((Type == PointEntryType.GoodPoint || Type == PointEntryType.Bonus) && Points <= 0)
+        {
+            yield return new ValidationResult("Les bons points et bonus doivent être strictement positifs.", new[] { nameof(Points) });
+        }
+
+        if ((Type == PointEntryType.BadPoint || Type == PointEntryType.Reward) && Points >= 0)
+        {
+            yield return new ValidationResult("Les mauvais points et récompenses doivent être négatifs.", new[] { nameof(Points) });
+        }
+    }
 }

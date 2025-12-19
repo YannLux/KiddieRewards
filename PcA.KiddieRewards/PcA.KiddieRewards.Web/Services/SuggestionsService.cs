@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PcA.KiddieRewards.Web.Data;
+using PcA.KiddieRewards.Web.Models;
 
 namespace PcA.KiddieRewards.Web.Services;
 
@@ -31,7 +32,7 @@ public class SuggestionsService(AppDbContext dbContext) : ISuggestionsService
 
         var query = dbContext.PointEntries
             .AsNoTracking()
-            .Where(p => p.FamilyId == familyId && p.IsActive && !p.IsReset);
+            .Where(p => p.FamilyId == familyId && p.IsActive && !p.IsReset && p.Type != PointEntryType.Reset);
 
         if (!string.IsNullOrWhiteSpace(normalizedFilter))
         {
