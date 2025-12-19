@@ -12,7 +12,8 @@ public record RecentPointEntryItem(
     string Reason,
     DateTime CreatedAt,
     bool IsActive,
-    bool IsReset);
+    bool IsReset,
+    PointEntryType Type);
 
 public record ParentDashboardViewModel(
     Guid FamilyId,

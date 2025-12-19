@@ -14,6 +14,9 @@ public class PointEntry
 
     public int Points { get; set; }
 
+    public PointEntryType Type { get; set; }
+        = PointEntryType.GoodPoint;
+
     [MaxLength(500)]
     public string Reason { get; set; } = string.Empty;
 
@@ -31,4 +34,22 @@ public class PointEntry
     public Member ChildMember { get; set; } = null!;
 
     public Member CreatedByMember { get; set; } = null!;
+}
+
+public enum PointEntryType
+{
+    [Display(Name = "Bon point")]
+    GoodPoint = 0,
+
+    [Display(Name = "Mauvais point")]
+    BadPoint = 1,
+
+    [Display(Name = "Récompense")]
+    Reward = 2,
+
+    [Display(Name = "Bonus")]
+    Bonus = 3,
+
+    [Display(Name = "Reset")]
+    Reset = 4
 }

@@ -51,12 +51,20 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
+                        <label asp-for="Type" class="form-label">Type de points</label>
+                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<PointEntryType>()"></select>
+                        <div class="form-text">
+                            Bon point / Bonus : valeur positive. Mauvais point : valeur négative. Récompense : valeur négative pour consommer les bons points. Reset calcule automatiquement le montant nécessaire pour revenir à 0.
+                        </div>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
                         <label asp-for="Points" class="form-label"></label>
                         <div class="input-group">
                             <span class="input-group-text">±</span>
                             <input asp-for="Points" class="form-control" type="number" />
                         </div>
-                        <div class="form-text">Utilisez un nombre négatif pour retirer des points.</div>
+                        <div class="form-text">Le signe sera ajusté selon le type choisi. Pour un reset, la valeur sera remplacée automatiquement.</div>
                         <span asp-validation-for="Points" class="text-danger"></span>
                     </div>
                 </div>

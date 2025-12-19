@@ -22,12 +22,18 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
+                        <label asp-for="Type" class="form-label">Type de points</label>
+                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<PointEntryType>()"></select>
+                        <div class="form-text">Reset recalcule automatiquement le montant pour remettre le solde à zéro.</div>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
                         <label asp-for="Points" class="form-label"></label>
                         <div class="input-group">
                             <span class="input-group-text">±</span>
                             <input asp-for="Points" class="form-control" type="number" />
                         </div>
-                        <div class="form-text">Utilisez un nombre négatif pour retirer des points.</div>
+                        <div class="form-text">Le signe doit correspondre au type choisi (positif, négatif ou calcul automatique).</div>
                         <span asp-validation-for="Points" class="text-danger"></span>
                     </div>
                     <div class="col-md-4">

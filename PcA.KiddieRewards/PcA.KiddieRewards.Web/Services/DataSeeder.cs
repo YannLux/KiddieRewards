@@ -18,11 +18,30 @@ public class DataSeeder(
     public async Task SeedAsync()
     {
         await dbContext.Database.EnsureCreatedAsync();
+        await EnsurePointEntryTypeColumnAsync();
         await dbContext.Database.MigrateAsync();
 
         await EnsureFamilyAsync();
         await EnsureMembersAsync();
         await EnsureOwnerUserAsync();
+    }
+
+    private async Task EnsurePointEntryTypeColumnAsync()
+    {
+        const string addColumnSql = """
+            IF NOT EXISTS (
+                SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'PointEntries' AND COLUMN_NAME = 'Type')
+            BEGIN
+                ALTER TABLE [PointEntries] ADD [Type] INT NOT NULL CONSTRAINT [DF_PointEntries_Type] DEFAULT 0;
+            END
+            """;
+
+        const int resetTypeValue = (int)PointEntryType.Reset;
+        var syncResetSql = $"UPDATE [PointEntries] SET [Type] = {resetTypeValue} WHERE [IsReset] = 1 AND [Type] <> {resetTypeValue}";
+
+        await dbContext.Database.ExecuteSqlRawAsync(addColumnSql);
+        await dbContext.Database.ExecuteSqlRawAsync(syncResetSql);
     }
 
     private async Task EnsureFamilyAsync()
