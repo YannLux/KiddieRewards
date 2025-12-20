@@ -189,14 +189,11 @@ public record AddPointsViewModel : IValidatableObject
             yield break;
         }
 
-        if ((Type == PointEntryType.GoodPoint || Type == PointEntryType.Bonus) && Points <= 0)
-        {
-            yield return new ValidationResult("Les bons points et bonus doivent être strictement positifs.", new[] { nameof(Points) });
-        }
+        var absolutePoints = Math.Abs(Points);
 
-        if ((Type == PointEntryType.BadPoint || Type == PointEntryType.Reward) && Points >= 0)
+        if (absolutePoints == 0)
         {
-            yield return new ValidationResult("Les mauvais points et récompenses doivent être négatifs.", new[] { nameof(Points) });
+            yield return new ValidationResult("La valeur doit être strictement supérieure à zéro. Le signe saisi sera ignoré et ajusté selon le type choisi.", new[] { nameof(Points) });
         }
     }
 }
@@ -226,14 +223,11 @@ public record EditPointViewModel : IValidatableObject
             yield break;
         }
 
-        if ((Type == PointEntryType.GoodPoint || Type == PointEntryType.Bonus) && Points <= 0)
-        {
-            yield return new ValidationResult("Les bons points et bonus doivent être strictement positifs.", new[] { nameof(Points) });
-        }
+        var absolutePoints = Math.Abs(Points);
 
-        if ((Type == PointEntryType.BadPoint || Type == PointEntryType.Reward) && Points >= 0)
+        if (absolutePoints == 0)
         {
-            yield return new ValidationResult("Les mauvais points et récompenses doivent être négatifs.", new[] { nameof(Points) });
+            yield return new ValidationResult("La valeur doit être strictement supérieure à zéro. Le signe saisi sera ignoré et ajusté selon le type choisi.", new[] { nameof(Points) });
         }
     }
 }
