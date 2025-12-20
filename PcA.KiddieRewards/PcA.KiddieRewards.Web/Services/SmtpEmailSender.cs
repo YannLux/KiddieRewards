@@ -55,21 +55,23 @@ public class SmtpEmailSender(IOptions<SmtpOptions> options, ILogger<SmtpEmailSen
 
     private async Task<bool> TrySendWithSmtpAsync(MailMessage message)
     {
-        using var client = new SmtpClient(_options.Host, _options.Port)
-        {
-            EnableSsl = _options.EnableSsl,
-            DeliveryMethod = SmtpDeliveryMethod.Network
-        };
-
-        client.UseDefaultCredentials = _options.UseDefaultCredentials;
-
-        if (!_options.UseDefaultCredentials && !string.IsNullOrWhiteSpace(_options.UserName))
-        {
-            client.Credentials = new NetworkCredential(_options.UserName, _options.Password);
-        }
+        var recipients = string.Join(", ", message.To.Select(r => r.Address));
 
         try
         {
+            using var client = new SmtpClient(_options.Host, _options.Port)
+            {
+                EnableSsl = _options.EnableSsl,
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+
+            client.UseDefaultCredentials = _options.UseDefaultCredentials;
+
+            if (!_options.UseDefaultCredentials && !string.IsNullOrWhiteSpace(_options.UserName))
+            {
+                client.Credentials = new NetworkCredential(_options.UserName, _options.Password);
+            }
+
             await client.SendMailAsync(message);
             return true;
         }
@@ -79,11 +81,15 @@ public class SmtpEmailSender(IOptions<SmtpOptions> options, ILogger<SmtpEmailSen
         }
         catch (IOException ex)
         {
-            _logger.LogError(ex, "SMTP connection failed while sending email to {Recipients}.", string.Join(", ", message.To.Select(r => r.Address)));
+            _logger.LogError(ex, "SMTP connection failed while sending email to {Recipients}.", recipients);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "SMTP configuration error while sending email to {Recipients}.", string.Join(", ", message.To.Select(r => r.Address)));
+            _logger.LogError(ex, "SMTP configuration error while sending email to {Recipients}.", recipients);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected SMTP failure while sending email to {Recipients}.", recipients);
         }
 
         return false;
