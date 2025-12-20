@@ -22,4 +22,14 @@ public record SmtpOptions
     public string? Password { get; init; }
 
     public bool UseDefaultCredentials { get; init; }
+
+    /// <summary>
+    /// When true, outgoing emails are written to a pickup directory if SMTP delivery fails.
+    /// </summary>
+    public bool FallbackToPickupDirectory { get; init; } = true;
+
+    /// <summary>
+    /// Optional location for the pickup directory. Defaults to a "mail-drop" folder under the application base path.
+    /// </summary>
+    public string? PickupDirectoryLocation { get; init; }
 }
