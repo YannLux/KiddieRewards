@@ -59,6 +59,14 @@
         PointEntryType.Reset => "badge bg-secondary-subtle text-secondary",
         _ => entry.Points > 0 ? "badge bg-success-subtle text-success" : "badge bg-secondary-subtle text-secondary"
     };
+
+    var history = Model.History;
+    var historyEntries = history.Entries;
+    var selectedChildName = history.SelectedChildId is null
+        ? "Tous les enfants"
+        : Model.Children.FirstOrDefault(c => c.MemberId == history.SelectedChildId.Value)?.DisplayName ?? "Enfant";
+    var firstEntryIndex = history.TotalCount == 0 ? 0 : ((history.CurrentPage - 1) * history.PageSize) + 1;
+    var lastEntryIndex = history.TotalCount == 0 ? 0 : Math.Min(history.CurrentPage * history.PageSize, history.TotalCount);
 }
 
 <div class="container py-4">
@@ -127,19 +135,37 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-0 d-flex align-items-center">
+                <div class="card-header bg-white border-0 d-flex align-items-center flex-wrap gap-2">
                     <div>
                         <p class="text-muted mb-1">Historique</p>
-                        <h5 class="mb-0">Dernières activités</h5>
+                        <h5 class="mb-0">Activités récentes</h5>
+                        <small class="text-muted">
+                            @selectedChildName
+                            @if (history.TotalCount > 0)
+                            {
+                                <text> • @history.TotalCount entrée(s)</text>
+                            }
+                        </small>
                     </div>
-                    <div class="ms-auto">
+                    <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
+                        <form method="get" asp-action="Dashboard" class="d-flex align-items-center gap-2">
+                            <input type="hidden" name="page" value="1" />
+                            <select class="form-select form-select-sm" name="childId">
+                                <option value="" @(history.SelectedChildId is null ? "selected" : "")>Tous les enfants</option>
+                                @foreach (var child in Model.Children)
+                                {
+                                    <option value="@child.MemberId" @(history.SelectedChildId == child.MemberId ? "selected" : "")>@child.DisplayName</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Filtrer</button>
+                        </form>
                         <a class="btn btn-sm btn-outline-secondary" href="/Parent/ChildDetails">Voir tout</a>
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    @if (!Model.RecentEntries.Any())
+                    @if (!historyEntries.Any())
                     {
-                        <div class="p-4 text-center text-muted">Aucune activité récente à afficher.</div>
+                        <div class="p-4 text-center text-muted">Aucune activité @(history.SelectedChildId is null ? "récente" : "pour cet enfant") à afficher.</div>
                     }
                     else
                     {
@@ -157,7 +183,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var entry in Model.RecentEntries)
+                                    @foreach (var entry in historyEntries)
                                     {
                                         <tr>
                                             <td class="fw-semibold">@entry.ChildDisplayName</td>
@@ -174,8 +200,63 @@
                         </div>
                     }
                 </div>
-                <div class="card-footer bg-white border-0 text-end">
-                    <button class="btn btn-outline-primary btn-sm">Exporter l'historique</button>
+                <div class="card-footer bg-white border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-2">
+                    <div class="d-flex align-items-center gap-2 w-100 w-lg-auto">
+                        <div class="small text-muted mb-0">
+                            @if (history.TotalCount == 0)
+                            {
+                                <span>Aucune entrée à afficher.</span>
+                            }
+                            else
+                            {
+                                <span>Affichage @firstEntryIndex-@lastEntryIndex sur @history.TotalCount entrée(s)</span>
+                            }
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm ms-auto ms-lg-0" href="#">Exporter l'historique</a>
+                    </div>
+                    @if (history.TotalPages > 1)
+                    {
+                        @{
+                            var startPage = Math.Max(1, history.CurrentPage - 2);
+                            var endPage = Math.Min(history.TotalPages, history.CurrentPage + 2);
+                        }
+                        <nav aria-label="Pagination de l'historique">
+                            <ul class="pagination pagination-sm mb-0 flex-wrap">
+                                <li class="page-item @(history.CurrentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage - 1)">Précédent</a>
+                                </li>
+                                @if (startPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="1">1</a>
+                                    </li>
+                                    if (startPage > 2)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                }
+                                @for (var pageIndex = startPage; pageIndex <= endPage; pageIndex++)
+                                {
+                                    <li class="page-item @(pageIndex == history.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@pageIndex">@pageIndex</a>
+                                    </li>
+                                }
+                                @if (endPage < history.TotalPages)
+                                {
+                                    if (endPage < history.TotalPages - 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@history.TotalPages">@history.TotalPages</a>
+                                    </li>
+                                }
+                                <li class="page-item @(history.CurrentPage == history.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage + 1)">Suivant</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
                 </div>
             </div>
         </div>

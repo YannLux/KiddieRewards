@@ -6,12 +6,22 @@ namespace PcA.KiddieRewards.Web.Services;
 
 public interface IDashboardService
 {
-    Task<ParentDashboardViewModel> BuildParentDashboardAsync(Guid familyId, CancellationToken cancellationToken = default);
+    Task<ParentDashboardViewModel> BuildParentDashboardAsync(
+        Guid familyId,
+        int page = 1,
+        Guid? childId = null,
+        CancellationToken cancellationToken = default);
 }
 
 public class DashboardService(AppDbContext dbContext, IPointsService pointsService) : IDashboardService
 {
-    public async Task<ParentDashboardViewModel> BuildParentDashboardAsync(Guid familyId, CancellationToken cancellationToken = default)
+    private const int HistoryPageSize = 10;
+
+    public async Task<ParentDashboardViewModel> BuildParentDashboardAsync(
+        Guid familyId,
+        int page = 1,
+        Guid? childId = null,
+        CancellationToken cancellationToken = default)
     {
         var children = await dbContext.Members
             .AsNoTracking()
@@ -26,6 +36,10 @@ public class DashboardService(AppDbContext dbContext, IPointsService pointsServi
             var totals = await pointsService.GetTotalsAsync(child.Id, cancellationToken);
             childSummaries.Add(new ChildDashboardItem(child.Id, child.DisplayName, totals.Plus, totals.Minus, totals.Net));
         }
+
+        var selectedChildId = childId.HasValue && childSummaries.Any(c => c.MemberId == childId.Value)
+            ? childId
+            : null;
 
         var activeEntriesQuery = dbContext.PointEntries
             .AsNoTracking()
@@ -44,11 +58,23 @@ public class DashboardService(AppDbContext dbContext, IPointsService pointsServi
             .Where(p => p.CreatedAt >= weekStart)
             .SumAsync(p => (int?)p.Points, cancellationToken) ?? 0;
 
-        var recentEntries = await dbContext.PointEntries
+        var historyQuery = dbContext.PointEntries
             .AsNoTracking()
-            .Where(p => p.FamilyId == familyId)
+            .Where(p => p.FamilyId == familyId);
+
+        if (selectedChildId.HasValue)
+        {
+            historyQuery = historyQuery.Where(p => p.ChildMemberId == selectedChildId.Value);
+        }
+
+        var totalCount = await historyQuery.CountAsync(cancellationToken);
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)HistoryPageSize));
+        var currentPage = Math.Clamp(page, 1, totalPages);
+
+        var recentEntries = await historyQuery
             .OrderByDescending(p => p.CreatedAt)
-            .Take(10)
+            .Skip((currentPage - 1) * HistoryPageSize)
+            .Take(HistoryPageSize)
             .Select(p => new RecentPointEntryItem(
                 p.Id,
                 p.ChildMemberId,
@@ -64,6 +90,14 @@ public class DashboardService(AppDbContext dbContext, IPointsService pointsServi
 
         var stats = new ParentDashboardStats(totalPlus, totalMinus, totalPlus - totalMinus, weeklyNet);
 
-        return new ParentDashboardViewModel(familyId, childSummaries, stats, recentEntries);
+        var history = new ParentDashboardHistory(
+            recentEntries,
+            currentPage,
+            totalPages,
+            HistoryPageSize,
+            totalCount,
+            selectedChildId);
+
+        return new ParentDashboardViewModel(familyId, childSummaries, stats, history);
     }
 }
