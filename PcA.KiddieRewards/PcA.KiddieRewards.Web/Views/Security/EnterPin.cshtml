@@ -1,0 +1,54 @@
+@model VerifyPinViewModel
+
+@{
+    ViewData["Title"] = "Confirmer le PIN";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="mb-3 text-center">
+                    <p class="text-muted mb-1">Sécurité</p>
+                    <h1 class="h4 mb-2">Entrez votre code PIN</h1>
+                    <p class="text-muted mb-0">
+                        @if (!string.IsNullOrWhiteSpace(Model.DisplayName))
+                        {
+                            <span>Bienvenue, <strong>@Model.DisplayName</strong>.</span>
+                        }
+                        else
+                        {
+                            <span>Merci de confirmer votre identité.</span>
+                        }
+                    </p>
+                </div>
+
+                <form asp-action="EnterPin" method="post">
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <div class="mb-3">
+                        <label asp-for="Pin" class="form-label">PIN</label>
+                        <input asp-for="Pin" class="form-control form-control-lg" type="password" autocomplete="off" inputmode="numeric" placeholder="4 à 10 chiffres" required />
+                        <span class="text-danger small d-block" asp-validation-for="Pin"></span>
+                        <small class="text-muted">Un PIN est requis à chaque arrivée sur le site.</small>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Continuer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <form method="post" action="/Identity/Account/Logout">
+                <button type="submit" class="btn btn-link text-muted">Changer de compte</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

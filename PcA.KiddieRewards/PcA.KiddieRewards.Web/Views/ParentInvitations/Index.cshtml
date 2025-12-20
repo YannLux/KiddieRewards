@@ -1,0 +1,105 @@
+@model ParentInvitationsViewModel
+
+@{
+    ViewData["Title"] = "Inviter un parent";
+
+    string BuildLink(string code) =>
+        Url.Action("JoinFamily", "Home", new { code }, Context.Request.Scheme) ?? string.Empty;
+
+    string StatusLabel(ParentInvitationItem invitation) => invitation switch
+    {
+        { IsRevoked: true } => "Révoqué",
+        { IsUsed: true } => "Utilisé",
+        { IsExpired: true } => "Expiré",
+        _ => "Actif"
+    };
+
+    string StatusBadge(ParentInvitationItem invitation) => invitation switch
+    {
+        { IsRevoked: true } => "badge bg-secondary",
+        { IsUsed: true } => "badge bg-warning text-dark",
+        { IsExpired: true } => "badge bg-danger",
+        _ => "badge bg-success"
+    };
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-1">Partage</p>
+            <h1 class="h3 mb-0">Inviter un parent</h1>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="/Parent/Dashboard">Retour au tableau de bord</a>
+            <form method="post" asp-action="Create">
+                <button type="submit" class="btn btn-primary">Générer un nouveau code</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <p class="text-muted">
+                Partagez un code ou un lien pour inviter un parent. Chaque code est valable jusqu'à sa date d'expiration
+                et devient inutilisable dès qu'il est utilisé ou révoqué.
+            </p>
+
+            @if (!Model.Invitations.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    Aucun code généré pour le moment. Créez un premier code d'invitation pour commencer.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Code</th>
+                                <th scope="col">Lien</th>
+                                <th scope="col">Exp. le</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var invitation in Model.Invitations)
+                            {
+                                var link = BuildLink(invitation.Code);
+                                <tr>
+                                    <td class="fw-semibold">@invitation.Code</td>
+                                    <td style="min-width: 260px;">
+                                        <div class="small text-truncate" title="@link">@link</div>
+                                    </td>
+                                    <td>@invitation.ExpiresAtUtc.ToLocalTime().ToString("g")</td>
+                                    <td>
+                                        <span class="@StatusBadge(invitation)">@StatusLabel(invitation)</span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (invitation.IsActive)
+                                        {
+                                            <form method="post" asp-action="Revoke" asp-route-id="@invitation.Id" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Révoquer</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Aucune action</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

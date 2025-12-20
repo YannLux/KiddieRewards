@@ -19,10 +19,12 @@ public class DataSeeder(
     {
         await dbContext.Database.EnsureCreatedAsync();
         await EnsurePointEntryTypeColumnAsync();
+        await EnsureFamilyInvitationTableAsync();
         await dbContext.Database.MigrateAsync();
 
         await EnsureFamilyAsync();
         await EnsureMembersAsync();
+        await EnsureInvitationAsync();
         await EnsureOwnerUserAsync();
     }
 
@@ -42,6 +44,35 @@ public class DataSeeder(
 
         await dbContext.Database.ExecuteSqlRawAsync(addColumnSql);
         await dbContext.Database.ExecuteSqlRawAsync(syncResetSql);
+    }
+
+    private async Task EnsureFamilyInvitationTableAsync()
+    {
+        const string sql = """
+            IF NOT EXISTS (
+                SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'FamilyInvitations'
+            )
+            BEGIN
+                CREATE TABLE [FamilyInvitations](
+                    [Id] UNIQUEIDENTIFIER NOT NULL,
+                    [FamilyId] UNIQUEIDENTIFIER NOT NULL,
+                    [Code] NVARCHAR(32) NOT NULL,
+                    [CreatedAtUtc] DATETIME2 NOT NULL,
+                    [ExpiresAtUtc] DATETIME2 NOT NULL,
+                    [IsRevoked] BIT NOT NULL CONSTRAINT [DF_FamilyInvitations_IsRevoked] DEFAULT 0,
+                    [CreatedByMemberId] UNIQUEIDENTIFIER NULL,
+                    [RedeemedByMemberId] UNIQUEIDENTIFIER NULL,
+                    [RedeemedAtUtc] DATETIME2 NULL,
+                    CONSTRAINT [PK_FamilyInvitations] PRIMARY KEY ([Id]),
+                    CONSTRAINT [FK_FamilyInvitations_Families_FamilyId] FOREIGN KEY ([FamilyId]) REFERENCES [Families]([Id]) ON DELETE CASCADE
+                );
+
+                CREATE UNIQUE INDEX [IX_FamilyInvitations_Code] ON [FamilyInvitations]([Code]);
+                CREATE INDEX [IX_FamilyInvitations_FamilyId] ON [FamilyInvitations]([FamilyId]);
+            END
+            """;
+
+        await dbContext.Database.ExecuteSqlRawAsync(sql);
     }
 
     private async Task EnsureFamilyAsync()
@@ -98,6 +129,27 @@ public class DataSeeder(
         };
 
         dbContext.Members.AddRange(parent, child1, child2);
+        await dbContext.SaveChangesAsync();
+    }
+
+    private async Task EnsureInvitationAsync()
+    {
+        const string demoCode = "FAMILLEDEMO";
+
+        if (await dbContext.FamilyInvitations.AnyAsync(i => i.FamilyId == FamilyId))
+        {
+            return;
+        }
+
+        dbContext.FamilyInvitations.Add(new FamilyInvitation
+        {
+            Id = Guid.NewGuid(),
+            FamilyId = FamilyId,
+            Code = demoCode,
+            CreatedAtUtc = DateTime.UtcNow,
+            ExpiresAtUtc = DateTime.UtcNow.AddYears(1)
+        });
+
         await dbContext.SaveChangesAsync();
     }
 

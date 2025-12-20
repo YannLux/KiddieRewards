@@ -4,14 +4,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PcA.KiddieRewards.Web.Constants;
 using PcA.KiddieRewards.Web.Data;
 using PcA.KiddieRewards.Web.Models;
 using PcA.KiddieRewards.Web.Services;
 
 namespace PcA.KiddieRewards.Web.Controllers
 {
-public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager, IDashboardService dashboardService) : Controller
-{
+    public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IDashboardService dashboardService, IMemberSignInService memberSignInService) : Controller
+    {
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             // If user is not authenticated, show public landing page
@@ -142,22 +143,12 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
             dbContext.Members.Add(member);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            // Ensure Identity role and assign to user, then refresh sign-in so role is effective immediately
+            // Ensure Identity role and sign in with member context immediately
             var identityUser = await userManager.FindByIdAsync(userGuid.ToString());
             if (identityUser is not null)
             {
-                const string parentRole = "Parent";
-                if (!await roleManager.RoleExistsAsync(parentRole))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(parentRole));
-                }
-
-                if (!await userManager.IsInRoleAsync(identityUser, parentRole))
-                {
-                    await userManager.AddToRoleAsync(identityUser, parentRole);
-                }
-
-                await signInManager.RefreshSignInAsync(identityUser);
+                await EnsureParentRoleAsync(identityUser);
+                await memberSignInService.SignInAsync(identityUser, member, HttpContext);
             }
 
             // Set selected family cookie
@@ -168,9 +159,14 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
 
         [Authorize]
         [HttpGet]
-        public IActionResult JoinFamily()
+        public IActionResult JoinFamily(string? code)
         {
-            return View(new JoinFamilyViewModel());
+            var viewModel = new JoinFamilyViewModel
+            {
+                FamilyInvitationCode = code ?? string.Empty
+            };
+
+            return View(viewModel);
         }
 
         [Authorize]
@@ -200,12 +196,17 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
                 return View(model);
             }
 
-            // Pour MVP: utiliser le code d'invitation comme clé pour retrouver la famille
-            // En production, cela devrait être un système plus sécurisé
-            var family = await dbContext.Families
-                .FirstOrDefaultAsync(f => f.Name == model.FamilyInvitationCode, cancellationToken);
+            var invitationCode = model.FamilyInvitationCode.Trim().ToUpperInvariant();
+            var invitation = await dbContext.FamilyInvitations
+                .Include(i => i.Family)
+                .FirstOrDefaultAsync(i => i.Code == invitationCode, cancellationToken);
 
-            if (family is null)
+            if (invitation is null ||
+                invitation.IsRevoked ||
+                invitation.RedeemedAtUtc is not null ||
+                invitation.ExpiresAtUtc < DateTime.UtcNow ||
+                invitation.Family is null ||
+                !invitation.Family.IsActive)
             {
                 ModelState.AddModelError(nameof(model.FamilyInvitationCode), "Code d'invitation invalide.");
                 return View(model);
@@ -214,7 +215,7 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
             var member = new Member
             {
                 Id = userGuid,
-                FamilyId = family.Id,
+                FamilyId = invitation.FamilyId,
                 DisplayName = model.DisplayName.Trim(),
                 AvatarKey = model.AvatarKey?.Trim() ?? "parent-star",
                 PinHash = pinHasher.HashPin(model.Pin),
@@ -223,28 +224,20 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
             };
 
             dbContext.Members.Add(member);
+            invitation.RedeemedAtUtc = DateTime.UtcNow;
+            invitation.RedeemedByMemberId = member.Id;
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            // Assign Identity role and refresh sign-in
+            // Assign Identity role and sign in with member context
             var identityUser = await userManager.FindByIdAsync(userGuid.ToString());
             if (identityUser is not null)
             {
-                const string parentRole = "Parent";
-                if (!await roleManager.RoleExistsAsync(parentRole))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(parentRole));
-                }
-
-                if (!await userManager.IsInRoleAsync(identityUser, parentRole))
-                {
-                    await userManager.AddToRoleAsync(identityUser, parentRole);
-                }
-
-                await signInManager.RefreshSignInAsync(identityUser);
+                await EnsureParentRoleAsync(identityUser);
+                await memberSignInService.SignInAsync(identityUser, member, HttpContext);
             }
 
             // Set selected family cookie
-            Response.Cookies.Append("SelectedFamilyId", family.Id.ToString(), new CookieOptions { HttpOnly = false });
+            Response.Cookies.Append("SelectedFamilyId", invitation.FamilyId.ToString(), new CookieOptions { HttpOnly = false });
 
             return RedirectToAction("Dashboard", "ParentDashboard");
         }
@@ -275,6 +268,20 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        private async Task EnsureParentRoleAsync(IdentityUser identityUser)
+        {
+            const string parentRole = "Parent";
+            if (!await roleManager.RoleExistsAsync(parentRole))
+            {
+                await roleManager.CreateAsync(new IdentityRole(parentRole));
+            }
+
+            if (!await userManager.IsInRoleAsync(identityUser, parentRole))
+            {
+                await userManager.AddToRoleAsync(identityUser, parentRole);
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions options)
 {
     public DbSet<Family> Families => Set<Family>();
 
+    public DbSet<FamilyInvitation> FamilyInvitations => Set<FamilyInvitation>();
+
     public DbSet<Member> Members => Set<Member>();
 
     public DbSet<PointEntry> PointEntries => Set<PointEntry>();
@@ -52,6 +54,28 @@ public class AppDbContext(DbContextOptions options)
             entity.HasOne(m => m.Family)
                   .WithMany(f => f.Members)
                   .HasForeignKey(m => m.FamilyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<FamilyInvitation>(entity =>
+        {
+            entity.HasKey(i => i.Id);
+            entity.Property(i => i.Code)
+                  .IsRequired()
+                  .HasMaxLength(32);
+            entity.Property(i => i.CreatedAtUtc)
+                  .HasColumnType("datetime2");
+            entity.Property(i => i.ExpiresAtUtc)
+                  .HasColumnType("datetime2");
+            entity.Property(i => i.IsRevoked)
+                  .HasDefaultValue(false);
+            entity.HasIndex(i => i.Code)
+                  .IsUnique();
+            entity.HasIndex(i => i.FamilyId);
+
+            entity.HasOne(i => i.Family)
+                  .WithMany()
+                  .HasForeignKey(i => i.FamilyId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

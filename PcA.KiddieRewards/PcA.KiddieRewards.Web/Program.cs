@@ -27,6 +27,14 @@ builder.Services.AddScoped<IPinHasher, PinHasher>();
 builder.Services.AddScoped<IPinAuthService, PinAuthService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<DataSeeder>();
+builder.Services.AddScoped<IMemberSignInService, MemberSignInService>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -53,9 +61,11 @@ app.UseStaticFiles(); // Serve wwwroot static assets (css/js/lib)
 
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRequirePin();
 app.UseEnsureFamily();
 
 app.MapStaticAssets();
