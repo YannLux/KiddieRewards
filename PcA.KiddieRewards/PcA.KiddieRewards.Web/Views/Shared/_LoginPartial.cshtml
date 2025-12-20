@@ -1,14 +1,35 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject PcA.KiddieRewards.Web.Data.AppDbContext DbContext
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     @await Component.InvokeAsync("FamilySelector")
 
+    @{
+        var displayName = User.FindFirst("DisplayName")?.Value ?? string.Empty;
+        var memberIdClaim = User.FindFirst("MemberId")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrWhiteSpace(displayName) && Guid.TryParse(memberIdClaim, out var memberId))
+        {
+            var member = await DbContext.Members
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == memberId);
+
+            displayName = member?.DisplayName ?? string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            displayName = User.Identity?.Name ?? "Profil";
+        }
+    }
+
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-page="/Account/Manage/Index">Hello @User.Identity.Name!</a>
+        <a class="nav-link text-dark" asp-area="" asp-page="/Account/Manage/Index">Bonjour @displayName!</a>
     </li>
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">

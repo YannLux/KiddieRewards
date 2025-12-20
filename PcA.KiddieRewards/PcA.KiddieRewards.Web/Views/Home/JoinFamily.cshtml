@@ -8,7 +8,7 @@
     <div class="col-lg-6">
         <div class="mb-4">
             <a href="/Home/OnboardingFamily" class="btn btn-link text-muted">
-                ? Retour
+                ← Retour
             </a>
         </div>
 
@@ -18,14 +18,14 @@
 
                 <form asp-action="JoinFamily" method="post">
                     <div class="mb-3">
-                        <label asp-for="FamilyInvitationCode" class="form-label">Code d'invitation</label>
-                        <input asp-for="FamilyInvitationCode" class="form-control" placeholder="Ex: FAM-12345-ABC" required>
-                        <small class="text-muted">Vous avez re�u ce code par email ou de la part d'un parent.</small>
+                        <label asp-for="FamilyInvitationCode" class="form-label">Code ou lien d'invitation</label>
+                        <input asp-for="FamilyInvitationCode" class="form-control" placeholder="Ex: ABCD2345EF" required>
+                        <small class="text-muted">Collez le code partagé par un parent ou cliquez sur le lien reçu.</small>
                         <span asp-validation-for="FamilyInvitationCode" class="text-danger small d-block"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="DisplayName" class="form-label">Votre nom (pr�nom de parent)</label>
+                        <label asp-for="DisplayName" class="form-label">Votre nom (parent)</label>
                         <input asp-for="DisplayName" class="form-control" placeholder="Ex: Pierre" required>
                         <span asp-validation-for="DisplayName" class="text-danger small"></span>
                     </div>
@@ -33,18 +33,18 @@
                     <div class="mb-4">
                         <label asp-for="Pin" class="form-label">Code PIN (4-10 chiffres)</label>
                         <input asp-for="Pin" type="password" inputmode="numeric" class="form-control" placeholder="Ex: 5678" required>
-                        <small class="text-muted">D�finissez votre PIN personnel pour les connexions rapides.</small>
+                        <small class="text-muted">Définissez votre PIN personnel : il sera demandé à chaque arrivée.</small>
                         <span asp-validation-for="Pin" class="text-danger small d-block"></span>
                     </div>
 
                     <div class="mb-4">
                         <label asp-for="AvatarKey" class="form-label">Avatar (optionnel)</label>
                         <select asp-for="AvatarKey" class="form-select">
-                            <option value="parent-star">? Parent Star</option>
-                            <option value="lion">?? Lion</option>
-                            <option value="panda">?? Panda</option>
-                            <option value="penguin">?? Penguin</option>
-                            <option value="bear">?? Bear</option>
+                            <option value="parent-star">⭐ Parent Star</option>
+                            <option value="lion">🦁 Lion</option>
+                            <option value="panda">🐼 Panda</option>
+                            <option value="penguin">🐧 Pingouin</option>
+                            <option value="bear">🐻 Ours</option>
                         </select>
                     </div>
 
@@ -60,7 +60,7 @@
         <div class="card border-0 bg-light mt-4">
             <div class="card-body">
                 <p class="text-muted small mb-0">
-                    <strong>Pas de code ?</strong> Demandez � un parent de votre famille de vous envoyer une invitation. Si vous �tes le premier parent, <a href="/Home/CreateFamily">cr�ez une nouvelle famille</a> � la place.
+                    <strong>Pas de code ?</strong> Demandez à un parent de votre famille de vous envoyer une invitation. Si vous êtes le premier parent, <a href="/Home/CreateFamily">créez une nouvelle famille</a> à la place.
                 </p>
             </div>
         </div>
