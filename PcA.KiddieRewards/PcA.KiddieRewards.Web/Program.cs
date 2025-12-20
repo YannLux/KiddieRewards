@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using PcA.KiddieRewards.Web.Data;
 using PcA.KiddieRewards.Web.Middleware;
@@ -28,6 +29,11 @@ builder.Services.AddScoped<IPinAuthService, PinAuthService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<IMemberSignInService, MemberSignInService>();
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+builder.Services.AddOptions<SmtpOptions>()
+    .Bind(builder.Configuration.GetSection("Smtp"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
