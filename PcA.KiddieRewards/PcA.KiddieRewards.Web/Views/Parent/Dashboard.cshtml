@@ -216,10 +216,9 @@
                     </div>
                     @if (history.TotalPages > 1)
                     {
-                        @{
-                            var startPage = Math.Max(1, history.CurrentPage - 2);
-                            var endPage = Math.Min(history.TotalPages, history.CurrentPage + 2);
-                        }
+                        var startPage = Math.Max(1, history.CurrentPage - 2);
+                        var endPage = Math.Min(history.TotalPages, history.CurrentPage + 2);
+
                         <nav aria-label="Pagination de l'historique">
                             <ul class="pagination pagination-sm mb-0 flex-wrap">
                                 <li class="page-item @(history.CurrentPage == 1 ? "disabled" : "")">
