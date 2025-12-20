@@ -148,7 +148,7 @@
                         </small>
                     </div>
                     <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
-                        <form method="get" asp-action="Dashboard" class="d-flex align-items-center gap-2">
+                        <form method="get" asp-controller="ParentDashboard" asp-action="Dashboard" class="d-flex align-items-center gap-2">
                             <input type="hidden" name="page" value="1" />
                             <select class="form-select form-select-sm" name="childId">
                                 <option value="" selected="@(history.SelectedChildId is null ? "selected" : null)">Tous les enfants</option>
@@ -222,12 +222,12 @@
                         <nav aria-label="Pagination de l'historique">
                             <ul class="pagination pagination-sm mb-0 flex-wrap">
                                 <li class="page-item @(history.CurrentPage == 1 ? "disabled" : "")">
-                                    <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage - 1)">Précédent</a>
+                                    <a class="page-link" asp-controller="ParentDashboard" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage - 1)">Précédent</a>
                                 </li>
                                 @if (startPage > 1)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="1">1</a>
+                                        <a class="page-link" asp-controller="ParentDashboard" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="1">1</a>
                                     </li>
                                     if (startPage > 2)
                                     {
@@ -237,7 +237,7 @@
                                 @for (var pageIndex = startPage; pageIndex <= endPage; pageIndex++)
                                 {
                                     <li class="page-item @(pageIndex == history.CurrentPage ? "active" : "")">
-                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@pageIndex">@pageIndex</a>
+                                        <a class="page-link" asp-controller="ParentDashboard" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@pageIndex">@pageIndex</a>
                                     </li>
                                 }
                                 @if (endPage < history.TotalPages)
@@ -247,11 +247,11 @@
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
                                     }
                                     <li class="page-item">
-                                        <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@history.TotalPages">@history.TotalPages</a>
+                                        <a class="page-link" asp-controller="ParentDashboard" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@history.TotalPages">@history.TotalPages</a>
                                     </li>
                                 }
                                 <li class="page-item @(history.CurrentPage == history.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage + 1)">Suivant</a>
+                                    <a class="page-link" asp-controller="ParentDashboard" asp-action="Dashboard" asp-route-childId="@(history.SelectedChildId?.ToString())" asp-route-page="@(history.CurrentPage + 1)">Suivant</a>
                                 </li>
                             </ul>
                         </nav>
