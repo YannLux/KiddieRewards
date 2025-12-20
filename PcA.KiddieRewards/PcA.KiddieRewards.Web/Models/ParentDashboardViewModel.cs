@@ -8,6 +8,7 @@ public record RecentPointEntryItem(
     Guid PointEntryId,
     Guid ChildMemberId,
     string ChildDisplayName,
+    string CreatedByDisplayName,
     int Points,
     string Reason,
     DateTime CreatedAt,

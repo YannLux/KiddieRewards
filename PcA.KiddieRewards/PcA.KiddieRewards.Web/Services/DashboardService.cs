@@ -53,6 +53,7 @@ public class DashboardService(AppDbContext dbContext, IPointsService pointsServi
                 p.Id,
                 p.ChildMemberId,
                 p.ChildMember.DisplayName,
+                p.CreatedByMember.DisplayName,
                 p.Points,
                 p.Reason,
                 p.CreatedAt,

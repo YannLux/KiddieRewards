@@ -149,6 +149,7 @@
                                     <tr>
                                         <th>Enfant</th>
                                         <th>Motif</th>
+                                        <th>Parent</th>
                                         <th>Type</th>
                                         <th>Points</th>
                                         <th>Date</th>
@@ -161,6 +162,7 @@
                                         <tr>
                                             <td class="fw-semibold">@entry.ChildDisplayName</td>
                                             <td>@entry.Reason</td>
+                                            <td>@entry.CreatedByDisplayName</td>
                                             <td><span class="@TypeBadgeClass(entry)">@TypeLabel(entry)</span></td>
                                             <td><span class="@PointsBadgeClass(entry)">@FormatPoints(entry.Points)</span></td>
                                             <td>@entry.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
@@ -190,7 +192,7 @@
                         <a class="btn btn-primary" asp-controller="ParentPoints" asp-action="AddPoints">Ajouter des points</a>
                         <a class="btn btn-outline-primary" href="/Parent/ChildDetails">Consulter un enfant</a>
                         <a class="btn btn-outline-secondary" href="/Parent/Settings">Ouvrir les réglages</a>
-                        <form asp-action="ResetAllChildren" method="post" class="d-grid">
+                        <form asp-controller="ParentDashboard" asp-action="ResetAllChildren" method="post" class="d-grid">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-outline-danger"
                                     onclick="return confirm('Créer une ligne de reset pour tous les enfants ?');">
