@@ -5,19 +5,18 @@
 @inject PcA.KiddieRewards.Web.Data.AppDbContext DbContext
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    @await Component.InvokeAsync("FamilySelector")
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @await Component.InvokeAsync("FamilySelector")
 
-    @{
         var displayName = User.FindFirst("DisplayName")?.Value ?? string.Empty;
         var memberIdClaim = User.FindFirst("MemberId")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrWhiteSpace(displayName) && Guid.TryParse(memberIdClaim, out var memberId))
         {
             var member = await DbContext.Members
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == memberId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == memberId);
 
             displayName = member?.DisplayName ?? string.Empty;
         }
@@ -26,24 +25,23 @@
         {
             displayName = User.Identity?.Name ?? "Profil";
         }
-    }
 
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-page="/Account/Manage/Index">Bonjour @displayName!</a>
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">
-            <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-page="/Account/Manage/Index">Bonjour @displayName!</a>
+        </li>
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">
+                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
 </ul>
