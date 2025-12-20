@@ -68,7 +68,9 @@ public class HomeController(AppDbContext dbContext, IPinHasher pinHasher, UserMa
                 Response.Cookies.Append("SelectedFamilyId", selectedFamilyId.ToString(), new CookieOptions { HttpOnly = false });
             }
 
-            var viewModel = await dashboardService.BuildParentDashboardAsync(selectedFamilyId, cancellationToken);
+            var viewModel = await dashboardService.BuildParentDashboardAsync(
+                selectedFamilyId,
+                cancellationToken: cancellationToken);
 
             // Reuse existing Parent dashboard view if present
             return View("~/Views/Parent/Dashboard.cshtml", viewModel);

@@ -16,8 +16,16 @@ public record RecentPointEntryItem(
     bool IsReset,
     PointEntryType Type);
 
+public record ParentDashboardHistory(
+    IReadOnlyList<RecentPointEntryItem> Entries,
+    int CurrentPage,
+    int TotalPages,
+    int PageSize,
+    int TotalCount,
+    Guid? SelectedChildId);
+
 public record ParentDashboardViewModel(
     Guid FamilyId,
     IReadOnlyList<ChildDashboardItem> Children,
     ParentDashboardStats Stats,
-    IReadOnlyList<RecentPointEntryItem> RecentEntries);
+    ParentDashboardHistory History);

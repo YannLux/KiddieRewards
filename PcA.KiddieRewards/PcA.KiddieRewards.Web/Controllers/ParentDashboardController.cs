@@ -11,14 +11,14 @@ namespace PcA.KiddieRewards.Web.Controllers;
 public class ParentDashboardController(AppDbContext dbContext, IDashboardService dashboardService, IPointsService pointsService) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Dashboard(CancellationToken cancellationToken)
+    public async Task<IActionResult> Dashboard(Guid? childId = null, int page = 1, CancellationToken cancellationToken = default)
     {
         if (!TryGetFamilyId(out var familyId))
         {
             return Forbid();
         }
 
-        var viewModel = await dashboardService.BuildParentDashboardAsync(familyId, cancellationToken);
+        var viewModel = await dashboardService.BuildParentDashboardAsync(familyId, page, childId, cancellationToken);
 
         // Explicitly point to the existing view under Views/Parent/Dashboard.cshtml
         return View("~/Views/Parent/Dashboard.cshtml", viewModel);
