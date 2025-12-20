@@ -190,6 +190,13 @@
                         <a class="btn btn-primary" asp-controller="ParentPoints" asp-action="AddPoints">Ajouter des points</a>
                         <a class="btn btn-outline-primary" href="/Parent/ChildDetails">Consulter un enfant</a>
                         <a class="btn btn-outline-secondary" href="/Parent/Settings">Ouvrir les réglages</a>
+                        <form asp-action="ResetAllChildren" method="post" class="d-grid">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger"
+                                    onclick="return confirm('Créer une ligne de reset pour tous les enfants ?');">
+                                Reset des compteurs
+                            </button>
+                        </form>
                     </div>
                     <div class="mt-3 small text-muted">
                         Astuce : vous pouvez proposer un flux AJAX simple pour valider les lignes sans recharger la page.

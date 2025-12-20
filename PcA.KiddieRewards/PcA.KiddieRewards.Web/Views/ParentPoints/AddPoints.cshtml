@@ -52,7 +52,11 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label asp-for="Type" class="form-label">Type de points</label>
-                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<PointEntryType>()"></select>
+                        @{
+                            var typeOptions = Html.GetEnumSelectList<PointEntryType>()
+                                .Where(item => item.Value != ((int)PointEntryType.Reset).ToString());
+                        }
+                        <select asp-for="Type" class="form-select" asp-items="typeOptions"></select>
                         <div class="form-text">
                             Bon point / Bonus : valeur positive. Mauvais point : valeur négative. Récompense : valeur négative pour consommer les bons points. Reset calcule automatiquement le montant nécessaire pour revenir à 0.
                         </div>
